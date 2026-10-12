@@ -946,13 +946,14 @@ export default function App() {
               ⚡ x{(1 / getReelSpeedMultiplier()).toFixed(1)} SPEED
             </div>
           )}
-          {/* Exit button */}
+          {/* Exit button - "фиксируем прибыль" */}
           <button 
-            className="px-2 py-1 rounded text-xs text-gray-500 hover:text-red-400 transition-colors border border-transparent hover:border-red-400/30"
+            className="px-3 py-1.5 rounded-lg text-xs font-bold text-green-400 border border-green-500/50 bg-green-500/10 hover:bg-green-500/20 hover:border-green-400 hover:shadow-[0_0_10px_rgba(0,255,136,0.3)] transition-all active:scale-95"
             onClick={handleExit}
-            title="Выйти из казино"
+            title="Выйти на главный экран"
+            style={{ fontFamily: 'Share Tech Mono' }}
           >
-            🚪
+            💰 фиксируем прибыль
           </button>
         </div>
       </header>
