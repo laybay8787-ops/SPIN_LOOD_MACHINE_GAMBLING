@@ -133,6 +133,7 @@ function ReelColumnFixed({
   reelIndex,
   winningCells,
   nearMissCells,
+  spinDuration,
 }: {
   symbols: string[];
   spinning: boolean;
@@ -140,6 +141,7 @@ function ReelColumnFixed({
   reelIndex: number;
   winningCells: Set<number>;
   nearMissCells: Set<number>;
+  spinDuration: number;
 }) {
   const animRef = useRef<number>(0);
   const [displaySymbols, setDisplaySymbols] = useState<string[]>(symbols);
@@ -153,7 +155,7 @@ function ReelColumnFixed({
 
   useEffect(() => {
     if (spinning && !stopped) {
-      const duration = CONFIG.REEL_SPIN_DURATION[reelIndex];
+      const duration = spinDuration;
       const startTime = performance.now();
       
       const strip: string[] = [];
@@ -420,6 +422,36 @@ export default function App() {
     }
   }, [toast]);
 
+  // ============ Dynamic Reel Speed (based on debt) ============
+  /**
+   * Чем выше долг — тем быстрее крутятся барабаны
+   * Это заставляет игрока проигрывать быстрее
+   */
+  const getReelSpeedMultiplier = useCallback((): number => {
+    const currentDebt = debt;
+    
+    // Находим подходящий множитель
+    let multiplier = 1.0;
+    for (const threshold of CONFIG.DEBT_SPEED_THRESHOLDS) {
+      if (currentDebt >= threshold.debt) {
+        multiplier = threshold.multiplier;
+      }
+    }
+    
+    return multiplier;
+  }, [debt]);
+
+  const getAdjustedReelDurations = useCallback((): number[] => {
+    const multiplier = getReelSpeedMultiplier();
+    return CONFIG.REEL_SPIN_DURATION.map((base, i) => {
+      const adjusted = Math.max(
+        Math.floor(base * multiplier),
+        CONFIG.REEL_SPIN_MIN[i]
+      );
+      return adjusted;
+    });
+  }, [getReelSpeedMultiplier]);
+
   // ============ Auto Loan System ============
   /**
    * Автоматически берёт кредиты пока баланс не покроет ставку
@@ -506,8 +538,9 @@ export default function App() {
     // Perform spin calculation
     const result = slotMachineRef.current.spin(currentBet);
 
-    // Animate reels stopping one by one
-    CONFIG.REEL_SPIN_DURATION.forEach((duration, reelIdx) => {
+    // Animate reels stopping one by one (speed depends on debt!)
+    const adjustedDurations = getAdjustedReelDurations();
+    adjustedDurations.forEach((duration, reelIdx) => {
       const timer = window.setTimeout(() => {
         audioRef.current.playReelStop();
         setReelStopped(prev => {
@@ -527,7 +560,7 @@ export default function App() {
 
     // Set grid for animation
     setGrid(result.grid);
-  }, [spinning, betIndex, autoLoan]);
+  }, [spinning, betIndex, autoLoan, getAdjustedReelDurations]);
 
   const handleSpinResult = (result: SpinResult, currentBet: number) => {
     setSpinning(false);
@@ -907,6 +940,12 @@ export default function App() {
               AUTO: {autoSpins}/{autoSpinTotal}
             </div>
           )}
+          {/* Speed indicator when in debt */}
+          {debt > 0 && (
+            <div className="px-2 py-1 rounded-full text-xs font-bold bg-red-900/50 border border-red-500 text-red-400 animate-pulse">
+              ⚡ x{(1 / getReelSpeedMultiplier()).toFixed(1)} SPEED
+            </div>
+          )}
           {/* Exit button */}
           <button 
             className="px-2 py-1 rounded text-xs text-gray-500 hover:text-red-400 transition-colors border border-transparent hover:border-red-400/30"
@@ -968,6 +1007,7 @@ export default function App() {
                   reelIndex={reelIdx}
                   winningCells={winningCells}
                   nearMissCells={nearMissCells}
+                  spinDuration={getAdjustedReelDurations()[reelIdx]}
                 />
               );
             })}

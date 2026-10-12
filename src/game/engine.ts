@@ -61,15 +61,22 @@ export class SlotMachine {
 
   /**
    * Выполняет спин и возвращает результат
+   * КАЗИНО ВСЕГДА В ВЫИГРЫШЕ: пользователь выигрывает только в 1 из 10 случаев (10%)
    */
   spin(bet: number): SpinResult {
-    // Определяем позиции остановки на каждом барабане
-    const reelPositions = this.reelStrips.map(strip => RNG.getInt(strip.length));
+    // КРИТИЧНО: Казино всегда в плюсе. Только 10% спинов могут быть выигрышными.
+    const isWinningSpin = RNG.getFloat() < CONFIG.WIN_CHANCE;
     
-    // Формируем сетку 5x3
+    if (!isWinningSpin) {
+      // ПРИНУДИТЕЛЬНЫЙ ПРОИГРЫШ — генерируем сетку без выигрышных комбинаций
+      return this.generateLosingSpin(bet);
+    }
+    
+    // Выигрышный спин (10% шанс) — обычная генерация
+    const reelPositions = this.reelStrips.map(strip => RNG.getInt(strip.length));
     const grid = this.getGrid(reelPositions);
     
-    // Проверяем джекпот
+    // Проверяем джекпот (очень редкий)
     const isJackpot = RNG.chance(CONFIG.JACKPOT_ODDS);
     
     // Оцениваем выигрыши
@@ -90,15 +97,86 @@ export class SlotMachine {
     
     // Джекпот
     if (isJackpot) {
-      totalWin += CONFIG.JACKPOT_START; // будет добавлено из текущего джекпота
-    }
-    
-    // Near miss корректировка (для проигрышных спинов)
-    if (totalWin === 0 && RNG.getFloat() < CONFIG.NEAR_MISS_CHANCE) {
-      this.applyNearMiss(grid, reelPositions);
+      totalWin += CONFIG.JACKPOT_START;
     }
     
     return { grid, reelPositions, wins, totalWin, scatterCount, isJackpot, nearMissLines };
+  }
+
+  /**
+   * Генерирует ЗАВЕДОМО ПРОИГРЫШНЫЙ спин
+   * Создаёт сетку где нет выигрышных линий, но иногда с near-miss эффектом
+   */
+  private generateLosingSpin(bet: number): SpinResult {
+    // Генерируем позиции до тех пор пока не будет выигрышных линий
+    let grid: string[][];
+    let reelPositions: number[];
+    let wins: WinLine[] = [];
+    let scatterCount = 0;
+    let attempts = 0;
+    const maxAttempts = 50;
+    
+    do {
+      reelPositions = this.reelStrips.map(strip => RNG.getInt(strip.length));
+      grid = this.getGrid(reelPositions!);
+      
+      // Оцениваем
+      const evaluator = new PaylineEvaluator();
+      const result = evaluator.evaluate(grid, bet);
+      wins = result.wins;
+      scatterCount = this.countScatters(grid);
+      attempts++;
+      
+      // Принимаем если нет выигрышей И нет 3+ scatter
+    } while ((wins.length > 0 || scatterCount >= 3) && attempts < maxAttempts);
+    
+    // Если не удалось сгенерировать проигрыш за 50 попыток — принудительно ломаем
+    if (wins.length > 0 || scatterCount >= 3) {
+      grid = this.forceLosingGrid();
+      reelPositions = [0, 0, 0, 0, 0];
+      wins = [];
+      scatterCount = 0;
+    }
+    
+    // Near miss эффект (18% проигрышных спинов) — "почти выиграл"
+    const nearMissLines: number[] = [];
+    if (RNG.getFloat() < CONFIG.NEAR_MISS_CHANCE) {
+      this.applyNearMiss(grid!, reelPositions!);
+      // Находим линии с near miss
+      const evaluator = new PaylineEvaluator();
+      const nmResult = evaluator.evaluate(grid!, bet);
+      nearMissLines.push(...nmResult.nearMissLines);
+    }
+    
+    return { 
+      grid: grid!, 
+      reelPositions: reelPositions!, 
+      wins: [], 
+      totalWin: 0, 
+      scatterCount, 
+      isJackpot: false, 
+      nearMissLines 
+    };
+  }
+
+  /**
+   * Принудительно создаёт проигрышную сетку
+   */
+  private forceLosingGrid(): string[][] {
+    // Простая проигрышная комбинация — все разные символы на каждой линии
+    const lowSymbols = ['cherry', 'lemon', 'bell'];
+    const grid: string[][] = [];
+    
+    for (let reel = 0; reel < CONFIG.REELS; reel++) {
+      const col: string[] = [];
+      for (let row = 0; row < CONFIG.ROWS; row++) {
+        // Чередование низких символов, гарантированно без выигрышных линий
+        col.push(lowSymbols[(reel + row) % lowSymbols.length]);
+      }
+      grid.push(col);
+    }
+    
+    return grid;
   }
 
   /**
