@@ -453,3 +453,39 @@ html, body {
   font-family: 'Orbitron', sans-serif;
   font-weight: 700;
 }
+
+/* Start screen animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.4; }
+}
+
+.start-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Exit screen */
+@keyframes fadeWave {
+  0% { opacity: 0.5; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.5; transform: scale(0.95); }
+}
+
+.exit-wave {
+  animation: fadeWave 2s ease-in-out infinite;
+}
+
+/* Auto loan notification */
+@keyframes loanFlash {
+  0%, 100% { background: rgba(255, 51, 102, 0.1); }
+  50% { background: rgba(255, 51, 102, 0.3); }
+}
+
+.loan-flash {
+  animation: loanFlash 0.5s ease-in-out 3;
+}

@@ -8,62 +8,66 @@ export const CONFIG = {
   REELS: 5,
   ROWS: 3,
   
-  // Стартовый баланс
-  START_BALANCE: 1000,
+  // Стартовый баланс (по умолчанию, выбирается на стартовом экране)
+  DEFAULT_START_BALANCE: 1000,
   
-  // Ставки
-  BET_LEVELS: [10, 25, 50, 100, 250, 500],
+  // Варианты начальных сумм на стартовом экране
+  START_BALANCE_OPTIONS: [500, 1000, 2000, 5000, 10000],
+  
+  // Ставки (максимум 10 000)
+  BET_LEVELS: [10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000],
   DEFAULT_BET_INDEX: 0,
   
-  // Символы
+  // Символы (веса увеличены для низких — казино имеет преимущество)
   SYMBOLS: {
-    CHERRY: { id: 'cherry', emoji: '🍒', weight: 10, type: 'low' as const },
-    LEMON: { id: 'lemon', emoji: '🍋', weight: 9, type: 'low' as const },
-    BELL: { id: 'bell', emoji: '🔔', weight: 7, type: 'medium' as const },
-    DIAMOND: { id: 'diamond', emoji: '💎', weight: 4, type: 'high' as const },
-    SEVEN: { id: 'seven', emoji: '7️⃣', weight: 3, type: 'high' as const },
-    WILD: { id: 'wild', emoji: '⚡', weight: 2, type: 'wild' as const },
-    SCATTER: { id: 'scatter', emoji: '🌀', weight: 2, type: 'scatter' as const },
+    CHERRY: { id: 'cherry', emoji: '🍒', weight: 14, type: 'low' as const },
+    LEMON: { id: 'lemon', emoji: '🍋', weight: 12, type: 'low' as const },
+    BELL: { id: 'bell', emoji: '🔔', weight: 8, type: 'medium' as const },
+    DIAMOND: { id: 'diamond', emoji: '💎', weight: 3, type: 'high' as const },
+    SEVEN: { id: 'seven', emoji: '7️⃣', weight: 2, type: 'high' as const },
+    WILD: { id: 'wild', emoji: '⚡', weight: 1, type: 'wild' as const },
+    SCATTER: { id: 'scatter', emoji: '🌀', weight: 1, type: 'scatter' as const },
   },
   
-  // Таблица выплат (умножение ставки на линию)
+  // Таблица выплат — СНИЖЕНА для преимущества казино (~85-88% RTP)
   PAYTABLE: {
-    cherry:  { 3: 5, 4: 15, 5: 40 },
-    lemon:   { 3: 8, 4: 25, 5: 80 },
-    bell:    { 3: 15, 4: 50, 5: 150 },
-    diamond: { 3: 30, 4: 100, 5: 300 },
-    seven:   { 3: 50, 4: 200, 5: 500 },
-    wild:    { 3: 100, 4: 400, 5: 1000 },
-    scatter: { 3: 2, 4: 5, 5: 20 }, // умножается на общую ставку
+    cherry:  { 3: 3, 4: 10, 5: 25 },
+    lemon:   { 3: 5, 4: 15, 5: 50 },
+    bell:    { 3: 10, 4: 30, 5: 100 },
+    diamond: { 3: 20, 4: 70, 5: 200 },
+    seven:   { 3: 30, 4: 120, 5: 350 },
+    wild:    { 3: 60, 4: 250, 5: 700 },
+    scatter: { 3: 1, 4: 3, 5: 10 }, // умножается на общую ставку
   },
   
   // Полосы барабанов (strip-based reels) — по 40 символов каждый
+  // Редкие символы встречаются реже, низкие — чаще
   REEL_STRIPS: [
     // Reel 1
-    ['lemon','cherry','cherry','lemon','bell','lemon','cherry','bell','lemon','cherry',
-     'diamond','lemon','bell','cherry','seven','lemon','wild','cherry','lemon','bell',
-     'scatter','cherry','lemon','bell','lemon','cherry','diamond','lemon','bell','cherry',
-     'lemon','bell','cherry','lemon','scatter','bell','cherry','lemon','bell','cherry'],
+    ['lemon','cherry','cherry','lemon','bell','lemon','cherry','lemon','bell','lemon',
+     'cherry','lemon','bell','cherry','lemon','cherry','lemon','bell','lemon','cherry',
+     'diamond','lemon','cherry','bell','lemon','cherry','lemon','bell','cherry','lemon',
+     'bell','cherry','lemon','bell','cherry','lemon','bell','cherry','lemon','cherry'],
     // Reel 2
-    ['bell','lemon','cherry','bell','cherry','lemon','diamond','bell','cherry','lemon',
-     'bell','cherry','seven','lemon','bell','cherry','wild','lemon','bell','cherry',
-     'lemon','bell','scatter','cherry','lemon','bell','cherry','lemon','diamond','bell',
-     'cherry','lemon','bell','cherry','lemon','bell','cherry','scatter','lemon','bell'],
+    ['bell','lemon','cherry','bell','cherry','lemon','bell','cherry','lemon','bell',
+     'cherry','lemon','bell','cherry','lemon','bell','cherry','lemon','bell','cherry',
+     'lemon','bell','cherry','lemon','bell','cherry','diamond','lemon','bell','cherry',
+     'lemon','bell','cherry','lemon','bell','cherry','lemon','bell','cherry','lemon'],
     // Reel 3
-    ['cherry','bell','lemon','cherry','bell','lemon','cherry','diamond','bell','lemon',
-     'cherry','bell','lemon','seven','cherry','bell','lemon','wild','cherry','bell',
-     'lemon','cherry','bell','scatter','lemon','cherry','bell','lemon','diamond','cherry',
-     'bell','lemon','cherry','bell','lemon','cherry','scatter','bell','lemon','cherry'],
+    ['cherry','bell','lemon','cherry','bell','lemon','cherry','bell','lemon','cherry',
+     'bell','lemon','cherry','bell','lemon','cherry','bell','lemon','cherry','bell',
+     'lemon','cherry','bell','lemon','cherry','bell','lemon','diamond','cherry','bell',
+     'lemon','cherry','bell','lemon','cherry','bell','lemon','cherry','bell','lemon'],
     // Reel 4
-    ['lemon','cherry','bell','lemon','cherry','bell','lemon','cherry','diamond','bell',
-     'lemon','cherry','bell','lemon','seven','cherry','bell','lemon','wild','cherry',
-     'bell','lemon','cherry','bell','scatter','lemon','cherry','bell','lemon','diamond',
-     'cherry','bell','lemon','cherry','bell','scatter','lemon','cherry','bell','lemon'],
+    ['lemon','cherry','bell','lemon','cherry','bell','lemon','cherry','bell','lemon',
+     'cherry','bell','lemon','cherry','bell','lemon','cherry','bell','lemon','cherry',
+     'bell','lemon','cherry','bell','lemon','cherry','bell','lemon','diamond','cherry',
+     'bell','lemon','cherry','bell','lemon','cherry','bell','lemon','cherry','bell'],
     // Reel 5
-    ['bell','cherry','lemon','bell','cherry','lemon','bell','cherry','lemon','diamond',
-     'bell','cherry','lemon','bell','seven','cherry','lemon','bell','wild','cherry',
-     'lemon','bell','cherry','lemon','scatter','bell','cherry','lemon','bell','diamond',
-     'cherry','lemon','bell','cherry','scatter','lemon','bell','cherry','lemon','bell'],
+    ['bell','cherry','lemon','bell','cherry','lemon','bell','cherry','lemon','bell',
+     'cherry','lemon','bell','cherry','lemon','bell','cherry','lemon','bell','cherry',
+     'lemon','bell','cherry','lemon','bell','cherry','lemon','bell','diamond','cherry',
+     'lemon','bell','cherry','lemon','bell','cherry','lemon','bell','cherry','lemon'],
   ],
   
   // Линии выплат (row для каждого барабана: 0=top, 1=mid, 2=bot)
