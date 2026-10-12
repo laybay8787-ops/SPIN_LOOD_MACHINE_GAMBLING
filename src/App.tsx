@@ -90,7 +90,7 @@ class ParticleSystem {
     this.particles = this.particles.filter(p => {
       p.x += p.vx;
       p.y += p.vy;
-      p.vy += 0.1; // gravity
+      p.vy += 0.1;
       p.rotation += p.rotationSpeed;
       p.life++;
 
@@ -126,7 +126,7 @@ class ParticleSystem {
 }
 
 // ============ Reel Component with Strip Animation ============
-function ReelColumn({ 
+function ReelColumnFixed({ 
   symbols, 
   spinning, 
   stopped, 
@@ -141,11 +141,10 @@ function ReelColumn({
   winningCells: Set<number>;
   nearMissCells: Set<number>;
 }) {
-  const stripRef = useRef<HTMLDivElement>(null);
   const animRef = useRef<number>(0);
   const [displaySymbols, setDisplaySymbols] = useState<string[]>(symbols);
   const [offset, setOffset] = useState(0);
-  const cellSize = 70; // matches --cell-size
+  const cellSize = 70;
 
   const getEmoji = (id: string) => {
     const sym = CONFIG.SYMBOLS[id.toUpperCase() as keyof typeof CONFIG.SYMBOLS];
@@ -154,41 +153,31 @@ function ReelColumn({
 
   useEffect(() => {
     if (spinning && !stopped) {
-      // Start spinning animation
       const duration = CONFIG.REEL_SPIN_DURATION[reelIndex];
       const startTime = performance.now();
-      const totalDistance = cellSize * 20; // scroll through many symbols
       
-      // Generate long strip for animation
       const strip: string[] = [];
       for (let i = 0; i < 25; i++) {
-        const randomSymbols = ['cherry', 'lemon', 'bell', 'diamond', 'seven', 'wild', 'scatter'];
+        const randomSymbols = ['cherry', 'lemon', 'bell', 'diamond', 'seven', 'cherry', 'lemon', 'bell'];
         strip.push(randomSymbols[Math.floor(Math.random() * randomSymbols.length)]);
       }
-      // Add final 3 symbols
       strip.push(...symbols);
       setDisplaySymbols(strip);
       
       const animate = (now: number) => {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
-        // Custom easing: fast start, slow end
         const eased = easeOutQuart(progress);
         const currentOffset = eased * (strip.length - 3) * cellSize;
-        
         setOffset(-currentOffset);
-        
         if (progress < 1) {
           animRef.current = requestAnimationFrame(animate);
         }
       };
       
       animRef.current = requestAnimationFrame(animate);
-      
       return () => cancelAnimationFrame(animRef.current);
     } else {
-      // Show final symbols
       setDisplaySymbols(symbols);
       setOffset(0);
     }
@@ -197,7 +186,6 @@ function ReelColumn({
   return (
     <div className="reel-container" style={{ width: 'var(--cell-size)', height: `calc(var(--cell-size) * 3)` }}>
       <div 
-        ref={stripRef}
         className="reel-strip"
         style={{ 
           transform: `translateY(${offset}px)`,
@@ -232,20 +220,123 @@ function easeOutQuart(t: number): number {
   return 1 - Math.pow(1 - t, 4);
 }
 
+// ============ Start Screen Component ============
+function StartScreen({ onEnter, onExit }: { onEnter: (balance: number) => void; onExit: () => void }) {
+  const [selectedBalance, setSelectedBalance] = useState<number>(CONFIG.START_BALANCE_OPTIONS[1] as number); // default 1000
+  const [hoveredOption, setHoveredOption] = useState<number | null>(null);
+
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center grid-bg relative overflow-hidden">
+      {/* Background effects */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: 'radial-gradient(ellipse at center, rgba(0, 240, 255, 0.05) 0%, transparent 70%)'
+      }} />
+      
+      {/* Title */}
+      <div className="text-center mb-8 z-10">
+        <h1 className="title-gradient text-3xl md:text-5xl font-black mb-2" style={{ fontFamily: 'Orbitron, sans-serif' }}>
+          NEON CYBER SPIN
+        </h1>
+        <p className="text-gray-400 text-sm md:text-base" style={{ fontFamily: 'Share Tech Mono' }}>
+          🎰 Киберпанк Слот 🎰
+        </p>
+      </div>
+
+      {/* Balance selection */}
+      <div className="z-10 text-center mb-6">
+        <h2 className="text-cyan-400 text-lg mb-4 font-bold" style={{ fontFamily: 'Orbitron' }}>
+          💰 Выберите стартовую сумму
+        </h2>
+        <div className="flex flex-wrap justify-center gap-3 max-w-md">
+          {CONFIG.START_BALANCE_OPTIONS.map((amount) => (
+            <button
+              key={amount}
+              className={`px-5 py-3 rounded-lg font-bold text-lg transition-all duration-200 border-2 ${
+                selectedBalance === amount
+                  ? 'border-cyan-400 bg-cyan-400/20 text-cyan-300 shadow-[0_0_20px_rgba(0,240,255,0.3)]'
+                  : 'border-gray-600 bg-gray-800/50 text-gray-400 hover:border-cyan-600 hover:text-cyan-400'
+              }`}
+              style={{ fontFamily: 'Share Tech Mono' }}
+              onClick={() => setSelectedBalance(amount)}
+              onMouseEnter={() => setHoveredOption(amount)}
+              onMouseLeave={() => setHoveredOption(null)}
+            >
+              {amount.toLocaleString()}
+              {(hoveredOption === amount) && (
+                <div className="text-[10px] text-gray-500 mt-1">кредитов</div>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Enter button */}
+      <div className="z-10 flex flex-col items-center gap-4">
+        <button
+          className="px-10 py-4 rounded-full font-black text-xl transition-all duration-200 border-2 border-cyan-400 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20 hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] active:scale-95"
+          style={{ fontFamily: 'Orbitron' }}
+          onClick={() => onEnter(selectedBalance)}
+        >
+          🎰 ВОЙТИ В КАЗИНО
+        </button>
+        
+        <button
+          className="px-6 py-2 rounded-lg text-sm text-gray-500 hover:text-red-400 transition-colors border border-transparent hover:border-red-400/30"
+          onClick={onExit}
+        >
+          🚪 Выйти из казино
+        </button>
+      </div>
+
+      {/* Footer info */}
+      <div className="absolute bottom-4 text-center text-gray-600 text-xs z-10">
+        <p>Демо-версия • Играйте ответственно • 18+</p>
+      </div>
+
+      {/* Decorative elements */}
+      <div className="absolute top-10 left-10 text-4xl opacity-20 animate-pulse">🎰</div>
+      <div className="absolute top-20 right-16 text-3xl opacity-20 animate-pulse" style={{ animationDelay: '0.5s' }}>💎</div>
+      <div className="absolute bottom-20 left-16 text-3xl opacity-20 animate-pulse" style={{ animationDelay: '1s' }}>⚡</div>
+      <div className="absolute bottom-10 right-10 text-4xl opacity-20 animate-pulse" style={{ animationDelay: '1.5s' }}>🌀</div>
+    </div>
+  );
+}
+
+// ============ Exit Screen ============
+function ExitScreen({ onReturn }: { onReturn: () => void }) {
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center grid-bg">
+      <div className="text-center">
+        <div className="text-6xl mb-6">👋</div>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-400 mb-4" style={{ fontFamily: 'Orbitron' }}>
+          До встречи!
+        </h1>
+        <p className="text-gray-500 mb-8">Спасибо за игру в Neon Cyber Spin</p>
+        <button
+          className="px-8 py-3 rounded-full font-bold border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400/10 transition-all"
+          style={{ fontFamily: 'Orbitron' }}
+          onClick={onReturn}
+        >
+          🔄 Вернуться
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ============ Main App Component ============
+type GameScreen = 'start' | 'game' | 'exit';
+
 export default function App() {
+  // Screen state
+  const [screen, setScreen] = useState<GameScreen>('start');
+  
   // Game state
-  const [balance, setBalance] = useState(() => {
-    const saved = localStorage.getItem(CONFIG.STORAGE_PREFIX + 'balance');
-    return saved ? parseFloat(saved) : CONFIG.START_BALANCE;
-  });
-  const [betIndex, setBetIndex] = useState(() => {
-    const saved = localStorage.getItem(CONFIG.STORAGE_PREFIX + 'betIndex');
-    return saved ? parseInt(saved) : CONFIG.DEFAULT_BET_INDEX;
-  });
+  const [balance, setBalance] = useState<number>(CONFIG.DEFAULT_START_BALANCE as number);
+  const [startBalance, setStartBalance] = useState<number>(CONFIG.DEFAULT_START_BALANCE as number);
+  const [betIndex, setBetIndex] = useState<number>(CONFIG.DEFAULT_BET_INDEX);
   const [spinning, setSpinning] = useState(false);
   const [grid, setGrid] = useState<string[][]>(() => {
-    // Initial random grid
     const symbols = ['cherry', 'lemon', 'bell', 'diamond', 'seven', 'cherry', 'lemon', 'bell'];
     return Array(5).fill(null).map(() => 
       Array(3).fill(null).map(() => symbols[Math.floor(Math.random() * symbols.length)])
@@ -260,17 +351,21 @@ export default function App() {
   const [freeSpins, setFreeSpins] = useState(0);
   const [freeSpinsTotalWin, setFreeSpinsTotalWin] = useState(0);
   const [freeSpinsActive, setFreeSpinsActive] = useState(false);
-  const [showLoanModal, setShowLoanModal] = useState(false);
-  const [showPaytable, setShowPaytable] = useState(false);
-  const [showStats, setShowStats] = useState(false);
-  const [showAchievements, setShowAchievements] = useState(false);
   const [autoSpins, setAutoSpins] = useState(0);
   const [autoSpinTotal, setAutoSpinTotal] = useState(0);
   const [toast, setToast] = useState<{ text: string; icon: string } | null>(null);
   const [soClose, setSoClose] = useState(false);
   const [history, setHistory] = useState<{ symbols: string; amount: number; multiplier: number }[]>([]);
   const [reelStopped, setReelStopped] = useState<boolean[]>([true, true, true, true, true]);
-  // Refs (must be before state that depends on them)
+  const [debtCleared, setDebtCleared] = useState(false);
+  const [loanCount, setLoanCount] = useState(0);
+  const [debt, setDebt] = useState(0);
+  const [statsVersion, setStatsVersion] = useState(0);
+  const [showPaytable, setShowPaytable] = useState(false);
+  const [showStats, setShowStats] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
+
+  // Refs
   const slotMachineRef = useRef(new SlotMachine());
   const statsRef = useRef(new StatsTracker());
   const loanRef = useRef(new LoanSystem());
@@ -283,15 +378,12 @@ export default function App() {
   const reelTimersRef = useRef<number[]>([]);
   const freeSpinsRef = useRef(freeSpins);
   const autoSpinsRef = useRef(autoSpins);
-
-  const [debtCleared, setDebtCleared] = useState(false);
-  const [loanCount, setLoanCount] = useState(loanRef.current.state.loanCount);
-  const [debt, setDebt] = useState(loanRef.current.state.debt);
-  const [statsVersion, setStatsVersion] = useState(0);
+  const balanceRef = useRef(balance);
 
   // Keep refs in sync
   useEffect(() => { freeSpinsRef.current = freeSpins; }, [freeSpins]);
   useEffect(() => { autoSpinsRef.current = autoSpins; }, [autoSpins]);
+  useEffect(() => { balanceRef.current = balance; }, [balance]);
 
   const bet = CONFIG.BET_LEVELS[betIndex];
   const jackpotAmount = jackpotRef.current.amount;
@@ -311,8 +403,10 @@ export default function App() {
 
   // Save balance
   useEffect(() => {
-    localStorage.setItem(CONFIG.STORAGE_PREFIX + 'balance', balance.toString());
-  }, [balance]);
+    if (screen === 'game') {
+      localStorage.setItem(CONFIG.STORAGE_PREFIX + 'balance', balance.toString());
+    }
+  }, [balance, screen]);
 
   useEffect(() => {
     localStorage.setItem(CONFIG.STORAGE_PREFIX + 'betIndex', betIndex.toString());
@@ -326,6 +420,47 @@ export default function App() {
     }
   }, [toast]);
 
+  // ============ Auto Loan System ============
+  /**
+   * Автоматически берёт кредиты пока баланс не покроет ставку
+   * Возвращает true если удалось набрать нужную сумму
+   */
+  const autoLoan = useCallback((neededAmount: number): boolean => {
+    let currentBalance = balanceRef.current;
+    let loansTaken = 0;
+    
+    while (currentBalance < neededAmount && loanRef.current.canBorrow()) {
+      const result = loanRef.current.borrow();
+      if (result.success) {
+        currentBalance += result.amount;
+        loansTaken++;
+      } else {
+        break;
+      }
+    }
+    
+    if (loansTaken > 0) {
+      setBalance(currentBalance);
+      setLoanCount(loanRef.current.state.loanCount);
+      setDebt(loanRef.current.state.debt);
+      audioRef.current.playLoanTaken();
+      statsRef.current.recordLoan();
+      
+      showToast('🏦', `Автокредит: +${loansTaken * CONFIG.LOAN_AMOUNT} (долг: ${Math.floor(loanRef.current.state.debt)})`);
+      
+      // Check debtor achievement
+      if (loanRef.current.state.loanCount >= CONFIG.MAX_LOANS) {
+        if (achievementsRef.current.check('debtor', true)) {
+          showToast('🏦', 'Достижение: Должник!');
+        }
+      }
+      
+      return currentBalance >= neededAmount;
+    }
+    
+    return currentBalance >= neededAmount;
+  }, []);
+
   // ============ Game Logic ============
   const doSpin = useCallback(() => {
     if (spinning) return;
@@ -333,11 +468,16 @@ export default function App() {
     const currentBet = CONFIG.BET_LEVELS[betIndex];
     
     // Check balance (skip for free spins)
-    if (freeSpinsRef.current <= 0 && balance < currentBet) {
-      if (loanCount < CONFIG.MAX_LOANS) {
-        setShowLoanModal(true);
+    if (freeSpinsRef.current <= 0 && balanceRef.current < currentBet) {
+      // Try auto loan
+      const canCover = autoLoan(currentBet);
+      if (!canCover) {
+        // Can't cover — show message
+        if (loanRef.current.state.loanCount >= CONFIG.MAX_LOANS) {
+          showToast('⛔', 'Лимит займов исчерпан! Снизьте ставку.');
+        }
+        return;
       }
-      return;
     }
 
     setSpinning(true);
@@ -349,7 +489,7 @@ export default function App() {
 
     // Deduct bet (not for free spins)
     if (freeSpinsRef.current <= 0) {
-      setBalance(b => b - currentBet);
+      setBalance((b: number) => b - currentBet);
     }
 
     // Contribute to jackpot
@@ -385,9 +525,9 @@ export default function App() {
       reelTimersRef.current.push(timer);
     });
 
-    // Set grid for animation (show spinning symbols)
+    // Set grid for animation
     setGrid(result.grid);
-  }, [spinning, betIndex, balance]);
+  }, [spinning, betIndex, autoLoan]);
 
   const handleSpinResult = (result: SpinResult, currentBet: number) => {
     setSpinning(false);
@@ -413,7 +553,7 @@ export default function App() {
     // Handle debt repayment
     let finalWin = winAmount;
     if (winAmount > 0 && !loanRef.current.isDebtFree()) {
-      const { toDebt, toBalance, newDebt } = loanRef.current.repayFromWin(winAmount);
+      const { toBalance, newDebt } = loanRef.current.repayFromWin(winAmount);
       finalWin = toBalance;
       setDebt(newDebt);
       if (newDebt <= 0) {
@@ -422,9 +562,9 @@ export default function App() {
         showToast('✅', 'Долг погашен!');
         setTimeout(() => setDebtCleared(false), 2000);
       }
-      setBalance(b => b + finalWin);
+      setBalance((b: number) => b + finalWin);
     } else {
-      setBalance(b => b + winAmount);
+      setBalance((b: number) => b + winAmount);
     }
 
     setLastWin(finalWin);
@@ -469,7 +609,6 @@ export default function App() {
       showToast('🌀', `БОНУС! ${newFreeSpins} фриспинов с x2!`);
       statsRef.current.recordBonus();
       
-      // Achievement
       const totalBonus = statsRef.current.stats.bonusTriggered;
       if (totalBonus >= 3) {
         checkAchievement('bonus_hunter');
@@ -495,7 +634,7 @@ export default function App() {
     }
 
     // Record stats
-    const newBalance = balance - (freeSpinsRef.current > 0 ? 0 : currentBet) + finalWin;
+    const newBalance = balanceRef.current - (freeSpinsRef.current > 0 ? 0 : currentBet) + finalWin;
     statsRef.current.recordSpin(currentBet, winAmount, newBalance);
     setStatsVersion(v => v + 1);
 
@@ -510,14 +649,12 @@ export default function App() {
       
       if (remaining <= 0) {
         setFreeSpinsActive(false);
-        // Show total free spins win
         const totalFsWin = freeSpinsTotalWin + finalWin;
         if (totalFsWin > 0) {
           showToast('🎉', `Фриспины завершены! Выигрыш: ${totalFsWin}`);
         }
         setFreeSpinsTotalWin(0);
       } else {
-        // Auto spin for free spins
         setTimeout(() => doSpin(), 1500);
       }
     }
@@ -526,11 +663,10 @@ export default function App() {
     if (autoSpinsRef.current > 0 && freeSpinsRef.current <= 0) {
       const remaining = autoSpinsRef.current - 1;
       setAutoSpins(remaining);
-      const newBalance = balance - currentBet + finalWin;
-      if (remaining > 0 && newBalance >= CONFIG.BET_LEVELS[betIndex]) {
+      const currentBal = balanceRef.current - currentBet + finalWin;
+      if (remaining > 0 && currentBal >= CONFIG.BET_LEVELS[betIndex]) {
         setTimeout(() => doSpin(), 1000);
-      } else if (remaining > 0 && loanCount < CONFIG.MAX_LOANS) {
-        // Will show loan modal on next spin
+      } else if (remaining > 0 && loanRef.current.canBorrow()) {
         setTimeout(() => doSpin(), 1000);
       } else {
         setAutoSpins(0);
@@ -542,42 +678,36 @@ export default function App() {
   const checkAchievementsAfterSpin = (winAmount: number, currentBet: number) => {
     const stats = statsRef.current.stats;
     
-    // First blood
     if (winAmount > 0) {
       if (achievementsRef.current.check('first_blood', true)) {
         showToast('🗡️', 'Достижение: Первая кровь!');
       }
     }
     
-    // Big fish
     if (winAmount >= currentBet * 50) {
       if (achievementsRef.current.check('big_fish', true)) {
         showToast('💰', 'Достижение: Крупная рыба!');
       }
     }
     
-    // Highroller
     if (stats.totalSpins >= 100) {
       if (achievementsRef.current.check('highroller', true)) {
         showToast('🎰', 'Достижение: Хайроллер!');
       }
     }
     
-    // In plus
-    if (stats.totalSpins >= 50 && balance > CONFIG.START_BALANCE) {
+    if (stats.totalSpins >= 50 && balance > startBalance) {
       if (achievementsRef.current.check('in_plus', true)) {
         showToast('📈', 'Достижение: В плюсе!');
       }
     }
     
-    // Streak
     if (stats.currentWinStreak >= 3) {
       if (achievementsRef.current.check('streak', true)) {
         showToast('🔥', 'Достижение: Серия!');
       }
     }
     
-    // Diamond magnate
     if (winLines.some(w => w.symbolId === 'diamond' && w.count === 5)) {
       if (achievementsRef.current.check('diamond_magnate', true)) {
         showToast('💎', 'Достижение: Алмазный магнат!');
@@ -600,7 +730,7 @@ export default function App() {
   const changeBet = (direction: 1 | -1) => {
     if (spinning) return;
     audioRef.current.playClick();
-    setBetIndex(prev => {
+    setBetIndex((prev: number) => {
       const next = prev + direction;
       if (next < 0 || next >= CONFIG.BET_LEVELS.length) return prev;
       return next;
@@ -611,25 +741,6 @@ export default function App() {
     if (spinning) return;
     audioRef.current.playClick();
     setBetIndex(CONFIG.BET_LEVELS.length - 1);
-  };
-
-  const takeLoan = () => {
-    const result = loanRef.current.borrow();
-    if (result.success) {
-      setBalance(b => b + result.amount);
-      setLoanCount(loanRef.current.state.loanCount);
-      setDebt(loanRef.current.state.debt);
-      audioRef.current.playLoanTaken();
-      statsRef.current.recordLoan();
-      
-      // Check debtor achievement
-      if (loanRef.current.state.loanCount >= CONFIG.MAX_LOANS) {
-        if (achievementsRef.current.check('debtor', true)) {
-          showToast('🏦', 'Достижение: Должник!');
-        }
-      }
-    }
-    setShowLoanModal(false);
   };
 
   const startAutoSpin = (count: number) => {
@@ -645,6 +756,40 @@ export default function App() {
     setAutoSpinTotal(0);
   };
 
+  const handleEnterCasino = (selectedBalance: number) => {
+    setBalance(selectedBalance);
+    setStartBalance(selectedBalance);
+    setBetIndex(0);
+    setScreen('game');
+    setFreeSpins(0);
+    setFreeSpinsActive(false);
+    setAutoSpins(0);
+    setHistory([]);
+    setLastWin(0);
+    setWinLines([]);
+    setNearMissLines([]);
+    // Reset loans for new session
+    loanRef.current.reset();
+    setLoanCount(0);
+    setDebt(0);
+    statsRef.current.reset();
+    setStatsVersion(0);
+  };
+
+  const handleExit = () => {
+    setScreen('exit');
+    setAutoSpins(0);
+    setFreeSpins(0);
+    setFreeSpinsActive(false);
+    clearInterval(tickIntervalRef.current);
+    reelTimersRef.current.forEach(t => clearTimeout(t));
+    reelTimersRef.current = [];
+  };
+
+  const handleReturnFromExit = () => {
+    setScreen('start');
+  };
+
   const resetGame = () => {
     localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'balance');
     localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'betIndex');
@@ -652,7 +797,8 @@ export default function App() {
     localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'loans');
     localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'jackpot');
     localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'achievements');
-    setBalance(CONFIG.START_BALANCE);
+    setBalance(CONFIG.DEFAULT_START_BALANCE);
+    setStartBalance(CONFIG.DEFAULT_START_BALANCE);
     setBetIndex(CONFIG.DEFAULT_BET_INDEX);
     setFreeSpins(0);
     setFreeSpinsActive(false);
@@ -665,11 +811,13 @@ export default function App() {
     loanRef.current.reset();
     jackpotRef.current.reset();
     achievementsRef.current.reset();
+    setScreen('start');
   };
 
   // Keyboard support
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
+      if (screen !== 'game') return;
       if (e.code === 'Space' && !spinning) {
         e.preventDefault();
         doSpin();
@@ -679,19 +827,15 @@ export default function App() {
         setShowPaytable(false);
         setShowStats(false);
         setShowAchievements(false);
-        setShowLoanModal(false);
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [spinning, doSpin]);
+  }, [spinning, doSpin, screen]);
 
-  // Expose calculateRTP for debugging
+  // Expose debug tools
   useEffect(() => {
     (window as any).calculateRTP = SlotMachine.calculateRTP;
-    (window as any).triggerJackpot = () => {
-      console.log('🎰 Jackpot triggered manually for testing');
-    };
     (window as any).triggerBonus = () => {
       setFreeSpins(CONFIG.FREE_SPINS_COUNT);
       setFreeSpinsActive(true);
@@ -711,7 +855,6 @@ export default function App() {
 
   const isNearMissCell = (reel: number, row: number): boolean => {
     if (nearMissLines.length === 0) return false;
-    // Check if this cell is part of a near miss (2 matching on a line)
     return nearMissLines.some(lineIdx => {
       const line = CONFIG.PAYLINES[lineIdx];
       return line[reel] === row && reel < 2;
@@ -724,7 +867,19 @@ export default function App() {
     return 'small';
   };
 
-  // ============ RENDER ============
+  // ============ SCREENS ============
+  
+  // Start Screen
+  if (screen === 'start') {
+    return <StartScreen onEnter={handleEnterCasino} onExit={handleExit} />;
+  }
+
+  // Exit Screen
+  if (screen === 'exit') {
+    return <ExitScreen onReturn={handleReturnFromExit} />;
+  }
+
+  // ============ GAME SCREEN ============
   return (
     <div className={`w-full h-full flex flex-col overflow-hidden grid-bg ${freeSpinsActive ? 'bonus-bg' : ''}`}>
       {/* Particle Canvas */}
@@ -752,6 +907,14 @@ export default function App() {
               AUTO: {autoSpins}/{autoSpinTotal}
             </div>
           )}
+          {/* Exit button */}
+          <button 
+            className="px-2 py-1 rounded text-xs text-gray-500 hover:text-red-400 transition-colors border border-transparent hover:border-red-400/30"
+            onClick={handleExit}
+            title="Выйти из казино"
+          >
+            🚪
+          </button>
         </div>
       </header>
 
@@ -775,7 +938,6 @@ export default function App() {
               ? 'border-red-500 shadow-[0_0_15px_rgba(255,51,102,0.3)]'
               : 'border-cyan-500 shadow-[0_0_15px_rgba(0,240,255,0.3)]'
         }`} style={{ background: 'linear-gradient(135deg, #0f1535 0%, #0a0e27 100%)' }}>
-          {/* Inner glow */}
           <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
             boxShadow: 'inset 0 0 20px rgba(255, 0, 234, 0.1)'
           }} />
@@ -798,7 +960,7 @@ export default function App() {
               });
               
               return (
-                <ReelColumn
+                <ReelColumnFixed
                   key={reelIdx}
                   symbols={reel}
                   spinning={spinning}
@@ -810,7 +972,6 @@ export default function App() {
               );
             })}
 
-            {/* So Close text */}
             {soClose && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <span className="so-close-text text-2xl">SO CLOSE!</span>
@@ -858,7 +1019,7 @@ export default function App() {
           <div className="text-center">
             <div className="text-[10px] text-yellow-300 uppercase">Ставка</div>
             <div className="text-sm font-bold text-yellow-400 neon-text-yellow">
-              {bet}
+              {bet.toLocaleString()}
             </div>
           </div>
           <div className="text-center">
@@ -952,56 +1113,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Loan Modal */}
-      {showLoanModal && (
-        <div className="modal-backdrop" onClick={() => setShowLoanModal(false)}>
-          <div className="modal-content max-w-sm" onClick={e => e.stopPropagation()}>
-            <h2 className="text-xl font-bold text-red-400 mb-4 text-center" style={{ fontFamily: 'Orbitron' }}>
-              ⚠️ Недостаточно средств!
-            </h2>
-            <p className="text-center text-gray-300 mb-4">
-              Ваш баланс: {Math.floor(balance)}<br/>
-              Ставка: {bet}<br/><br/>
-              Взять займ +{CONFIG.LOAN_AMOUNT} кредитов?<br/>
-              <span className="text-red-400 text-sm">
-                Возврат: {CONFIG.LOAN_AMOUNT * (1 + CONFIG.LOAN_INTEREST)} (10% комиссия)<br/>
-                Осталось займов: {CONFIG.MAX_LOANS - loanCount}/{CONFIG.MAX_LOANS}
-              </span>
-            </p>
-            <div className="flex gap-3 justify-center flex-wrap">
-              <button
-                className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded font-bold text-white"
-                onClick={takeLoan}
-              >
-                💰 Взять займ (+{CONFIG.LOAN_AMOUNT})
-              </button>
-              {betIndex > 0 && (
-                <button
-                  className="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 rounded font-bold text-white"
-                  onClick={() => { setBetIndex(0); setShowLoanModal(false); }}
-                >
-                  Сменить ставку ({CONFIG.BET_LEVELS[0]})
-                </button>
-              )}
-              <button
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-500 rounded font-bold text-white"
-                onClick={() => setShowLoanModal(false)}
-              >
-                Отмена
-              </button>
-            </div>
-            {loanCount >= CONFIG.MAX_LOANS && (
-              <div className="mt-4 text-center">
-                <p className="text-red-400 text-sm mb-2">Лимит займов исчерпан. Начните новую игру.</p>
-                <button className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded text-white" onClick={resetGame}>
-                  🔄 Новая игра
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* Paytable Modal */}
       {showPaytable && (
         <div className="modal-backdrop" onClick={() => setShowPaytable(false)}>
@@ -1016,9 +1127,9 @@ export default function App() {
                   <div key={key} className="bg-black/30 rounded-lg p-3 border border-white/10">
                     <div className="text-2xl text-center mb-1">{sym?.emoji}</div>
                     <div className="text-xs text-center text-gray-400">
-                      x3: <span className="text-white">{pays[3]}</span> | 
-                      x4: <span className="text-white">{pays[4]}</span> | 
-                      x5: <span className="text-white">{pays[5]}</span>
+                      x3: <span className="text-white">{(pays as any)[3]}</span> | 
+                      x4: <span className="text-white">{(pays as any)[4]}</span> | 
+                      x5: <span className="text-white">{(pays as any)[5]}</span>
                     </div>
                   </div>
                 );
@@ -1030,6 +1141,7 @@ export default function App() {
               <p>📏 Выплаты только слева направо, 3+ одинаковых</p>
               <p>💰 Scatter выплаты умножаются на общую ставку</p>
               <p>🎰 10 фиксированных линий выплат</p>
+              <p>💳 При нехватке средств — автокредит (10% комиссия)</p>
             </div>
             <div className="mt-4 text-center">
               <button className="ctrl-btn" onClick={() => setShowPaytable(false)}>Закрыть</button>
@@ -1061,7 +1173,6 @@ export default function App() {
               <StatRow label="Займов взято" value={statsRef.current.stats.loansTaken.toString()} />
               <StatRow label="Бонусов активировано" value={statsRef.current.stats.bonusTriggered.toString()} />
             </div>
-            {/* Mini balance chart */}
             {statsRef.current.stats.balanceHistory.length > 1 && (
               <div className="mt-4">
                 <div className="text-xs text-gray-400 mb-1">График баланса:</div>
