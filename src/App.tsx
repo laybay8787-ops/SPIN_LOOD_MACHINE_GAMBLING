@@ -224,82 +224,134 @@ function easeOutQuart(t: number): number {
 
 // ============ Start Screen Component ============
 function StartScreen({ onEnter, onExit }: { onEnter: (balance: number) => void; onExit: () => void }) {
-  const [selectedBalance, setSelectedBalance] = useState<number>(CONFIG.START_BALANCE_OPTIONS[1] as number); // default 1000
+  const [selectedBalance, setSelectedBalance] = useState<number>(CONFIG.START_BALANCE_OPTIONS[1] as number);
   const [hoveredOption, setHoveredOption] = useState<number | null>(null);
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center grid-bg relative overflow-hidden">
-      {/* Background effects */}
+    <div className="w-full h-full flex flex-col items-center justify-center grid-bg relative overflow-hidden safe-area-top safe-area-bottom">
+      {/* Animated background effects */}
       <div className="absolute inset-0 pointer-events-none" style={{
-        background: 'radial-gradient(ellipse at center, rgba(0, 240, 255, 0.05) 0%, transparent 70%)'
+        background: `
+          radial-gradient(ellipse at 20% 30%, rgba(0, 240, 255, 0.08) 0%, transparent 50%),
+          radial-gradient(ellipse at 80% 70%, rgba(255, 0, 234, 0.08) 0%, transparent 50%),
+          radial-gradient(ellipse at 50% 50%, rgba(255, 247, 0, 0.03) 0%, transparent 70%)
+        `
       }} />
       
-      {/* Title */}
-      <div className="text-center mb-8 z-10">
-        <h1 className="title-gradient text-3xl md:text-5xl font-black mb-2" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-          NEON CYBER SPIN
-        </h1>
-        <p className="text-gray-400 text-sm md:text-base" style={{ fontFamily: 'Share Tech Mono' }}>
-          🎰 Киберпанк Слот 🎰
+      {/* Floating particles background */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full opacity-20"
+            style={{
+              width: `${Math.random() * 4 + 2}px`,
+              height: `${Math.random() * 4 + 2}px`,
+              background: ['#00f0ff', '#ff00ea', '#fff700'][i % 3],
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `float ${3 + Math.random() * 4}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 2}s`,
+            }}
+          />
+        ))}
+      </div>
+      
+      {/* Title with enhanced glow */}
+      <div className="text-center mb-8 z-10 px-4">
+        <div className="relative inline-block">
+          <h1 
+            className="title-gradient text-4xl sm:text-5xl md:text-6xl font-black mb-3 tracking-wider" 
+            style={{ fontFamily: 'Orbitron, sans-serif' }}
+          >
+            NEON CYBER
+          </h1>
+          <h1 
+            className="title-gradient text-3xl sm:text-4xl md:text-5xl font-black tracking-widest" 
+            style={{ fontFamily: 'Orbitron, sans-serif' }}
+          >
+            SPIN
+          </h1>
+          <div className="absolute -inset-4 bg-cyan-500/5 blur-3xl rounded-full" />
+        </div>
+        <p className="text-gray-400 text-sm md:text-base mt-4 tracking-wider" style={{ fontFamily: 'Share Tech Mono' }}>
+          ✨ КИБЕРПАНК СЛОТ ✨
         </p>
       </div>
 
-      {/* Balance selection */}
-      <div className="z-10 text-center mb-6">
-        <h2 className="text-cyan-400 text-lg mb-4 font-bold" style={{ fontFamily: 'Orbitron' }}>
-          💰 Выберите стартовую сумму
+      {/* Balance selection with glass effect */}
+      <div className="z-10 text-center mb-8 px-4 w-full max-w-lg">
+        <h2 className="text-cyan-400 text-base sm:text-lg mb-5 font-bold tracking-wide" style={{ fontFamily: 'Orbitron' }}>
+          💰 ВЫБЕРИТЕ СУММУ
         </h2>
-        <div className="flex flex-wrap justify-center gap-3 max-w-md">
-          {CONFIG.START_BALANCE_OPTIONS.map((amount) => (
-            <button
-              key={amount}
-              className={`px-5 py-3 rounded-lg font-bold text-lg transition-all duration-200 border-2 ${
-                selectedBalance === amount
-                  ? 'border-cyan-400 bg-cyan-400/20 text-cyan-300 shadow-[0_0_20px_rgba(0,240,255,0.3)]'
-                  : 'border-gray-600 bg-gray-800/50 text-gray-400 hover:border-cyan-600 hover:text-cyan-400'
-              }`}
-              style={{ fontFamily: 'Share Tech Mono' }}
-              onClick={() => setSelectedBalance(amount)}
-              onMouseEnter={() => setHoveredOption(amount)}
-              onMouseLeave={() => setHoveredOption(null)}
-            >
-              {amount.toLocaleString()}
-              {(hoveredOption === amount) && (
-                <div className="text-[10px] text-gray-500 mt-1">кредитов</div>
-              )}
-            </button>
-          ))}
+        <div className="glass-panel p-4 sm:p-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {CONFIG.START_BALANCE_OPTIONS.map((amount) => (
+              <button
+                key={amount}
+                className={`relative px-4 py-4 rounded-xl font-bold text-base sm:text-lg transition-all duration-300 border-2 ${
+                  selectedBalance === amount
+                    ? 'border-cyan-400 bg-gradient-to-br from-cyan-400/20 to-cyan-600/10 text-cyan-300 shadow-[0_0_25px_rgba(0,240,255,0.4)] scale-105'
+                    : 'border-gray-700 bg-gray-800/30 text-gray-400 hover:border-cyan-600/50 hover:text-cyan-400 hover:bg-gray-800/50'
+                }`}
+                style={{ fontFamily: 'Share Tech Mono' }}
+                onClick={() => setSelectedBalance(amount)}
+                onMouseEnter={() => setHoveredOption(amount)}
+                onMouseLeave={() => setHoveredOption(null)}
+              >
+                <div className="text-xl sm:text-2xl font-black">{amount.toLocaleString()}</div>
+                {(hoveredOption === amount || selectedBalance === amount) && (
+                  <div className="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">кредитов</div>
+                )}
+                {selectedBalance === amount && (
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-400 rounded-full animate-pulse" />
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Enter button */}
-      <div className="z-10 flex flex-col items-center gap-4">
+      {/* Enter button with enhanced effects */}
+      <div className="z-10 flex flex-col items-center gap-5 px-4">
         <button
-          className="px-10 py-4 rounded-full font-black text-xl transition-all duration-200 border-2 border-cyan-400 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20 hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] active:scale-95"
+          className="group relative px-12 py-5 rounded-full font-black text-lg sm:text-xl transition-all duration-300 border-2 border-cyan-400 bg-gradient-to-r from-cyan-400/10 via-cyan-500/20 to-cyan-400/10 text-cyan-300 hover:from-cyan-400/20 hover:via-cyan-500/30 hover:to-cyan-400/20 hover:shadow-[0_0_40px_rgba(0,240,255,0.5)] active:scale-95 overflow-hidden"
           style={{ fontFamily: 'Orbitron' }}
           onClick={() => onEnter(selectedBalance)}
         >
-          🎰 ВОЙТИ В КАЗИНО
+          <span className="relative z-10 flex items-center gap-3">
+            <span className="text-2xl">🎰</span>
+            <span>ВОЙТИ В КАЗИНО</span>
+          </span>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
         </button>
         
         <button
-          className="px-6 py-2 rounded-lg text-sm text-gray-500 hover:text-red-400 transition-colors border border-transparent hover:border-red-400/30"
+          className="px-8 py-3 rounded-xl text-sm text-gray-500 hover:text-red-400 transition-all duration-300 border border-gray-700 hover:border-red-400/50 hover:bg-red-400/5 active:scale-95"
+          style={{ fontFamily: 'Share Tech Mono' }}
           onClick={onExit}
         >
-          🚪 Выйти из казино
+          <span className="flex items-center gap-2">
+            <span>🚪</span>
+            <span>Выйти</span>
+          </span>
         </button>
       </div>
 
-      {/* Footer info */}
-      <div className="absolute bottom-4 text-center text-gray-600 text-xs z-10">
-        <p>Демо-версия • Играйте ответственно • 18+</p>
+      {/* Footer info with glass effect */}
+      <div className="absolute bottom-4 left-0 right-0 text-center z-10 px-4">
+        <div className="inline-block glass-panel px-4 py-2">
+          <p className="text-gray-500 text-xs tracking-wide">
+            🎮 Демо-версия • Играйте ответственно • 18+
+          </p>
+        </div>
       </div>
 
-      {/* Decorative elements */}
-      <div className="absolute top-10 left-10 text-4xl opacity-20 animate-pulse">🎰</div>
-      <div className="absolute top-20 right-16 text-3xl opacity-20 animate-pulse" style={{ animationDelay: '0.5s' }}>💎</div>
-      <div className="absolute bottom-20 left-16 text-3xl opacity-20 animate-pulse" style={{ animationDelay: '1s' }}>⚡</div>
-      <div className="absolute bottom-10 right-10 text-4xl opacity-20 animate-pulse" style={{ animationDelay: '1.5s' }}>🌀</div>
+      {/* Decorative floating elements */}
+      <div className="absolute top-8 left-8 text-4xl sm:text-5xl opacity-30 animate-pulse">🎰</div>
+      <div className="absolute top-16 right-12 text-3xl sm:text-4xl opacity-30 animate-pulse" style={{ animationDelay: '0.5s' }}>💎</div>
+      <div className="absolute bottom-24 left-12 text-3xl sm:text-4xl opacity-30 animate-pulse" style={{ animationDelay: '1s' }}>⚡</div>
+      <div className="absolute bottom-16 right-8 text-4xl sm:text-5xl opacity-30 animate-pulse" style={{ animationDelay: '1.5s' }}>🌀</div>
     </div>
   );
 }
@@ -307,19 +359,36 @@ function StartScreen({ onEnter, onExit }: { onEnter: (balance: number) => void; 
 // ============ Exit Screen ============
 function ExitScreen({ onReturn }: { onReturn: () => void }) {
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center grid-bg">
-      <div className="text-center">
-        <div className="text-6xl mb-6">👋</div>
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-400 mb-4" style={{ fontFamily: 'Orbitron' }}>
+    <div className="w-full h-full flex flex-col items-center justify-center grid-bg relative overflow-hidden safe-area-top safe-area-bottom">
+      {/* Background effects */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: `
+          radial-gradient(ellipse at 30% 40%, rgba(0, 240, 255, 0.05) 0%, transparent 50%),
+          radial-gradient(ellipse at 70% 60%, rgba(255, 0, 234, 0.05) 0%, transparent 50%)
+        `
+      }} />
+      
+      <div className="text-center z-10 px-6">
+        <div className="text-7xl sm:text-8xl mb-8 exit-wave">👋</div>
+        <h1 
+          className="text-3xl sm:text-4xl font-black text-gray-300 mb-4 tracking-wide" 
+          style={{ fontFamily: 'Orbitron' }}
+        >
           До встречи!
         </h1>
-        <p className="text-gray-500 mb-8">Спасибо за игру в Neon Cyber Spin</p>
+        <p className="text-gray-500 mb-10 text-base sm:text-lg tracking-wide" style={{ fontFamily: 'Share Tech Mono' }}>
+          Спасибо за игру в Neon Cyber Spin
+        </p>
         <button
-          className="px-8 py-3 rounded-full font-bold border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400/10 transition-all"
+          className="group relative px-10 py-4 rounded-full font-bold text-base sm:text-lg transition-all duration-300 border-2 border-cyan-400 text-cyan-400 hover:bg-cyan-400/10 hover:shadow-[0_0_30px_rgba(0,240,255,0.3)] active:scale-95 overflow-hidden"
           style={{ fontFamily: 'Orbitron' }}
           onClick={onReturn}
         >
-          🔄 Вернуться
+          <span className="relative z-10 flex items-center gap-3">
+            <span className="text-xl">🔄</span>
+            <span>Вернуться</span>
+          </span>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
         </button>
       </div>
     </div>
@@ -366,6 +435,8 @@ export default function App() {
   const [showPaytable, setShowPaytable] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [showExitSummary, setShowExitSummary] = useState(false);
+  const [exitResult, setExitResult] = useState<{ type: 'profit' | 'loss'; amount: number } | null>(null);
 
   // Refs
   const slotMachineRef = useRef(new SlotMachine());
@@ -800,13 +871,35 @@ export default function App() {
   };
 
   const handleExit = () => {
-    setScreen('exit');
+    // Останавливаем все процессы
     setAutoSpins(0);
     setFreeSpins(0);
     setFreeSpinsActive(false);
     clearInterval(tickIntervalRef.current);
     reelTimersRef.current.forEach(t => clearTimeout(t));
     reelTimersRef.current = [];
+    
+    // Рассчитываем итог
+    const profit = balance - startBalance;
+    const currentDebt = loanRef.current.state.debt;
+    
+    if (profit > 0 && currentDebt === 0) {
+      // Чистый выигрыш
+      setExitResult({ type: 'profit', amount: profit });
+    } else if (currentDebt > 0) {
+      // Есть долг
+      setExitResult({ type: 'loss', amount: currentDebt });
+    } else {
+      // Проигрыш или ноль
+      setExitResult({ type: 'loss', amount: Math.abs(profit) });
+    }
+    
+    setShowExitSummary(true);
+  };
+  
+  const confirmExit = () => {
+    setShowExitSummary(false);
+    setScreen('exit');
   };
 
   const handleReturnFromExit = () => {
@@ -908,42 +1001,42 @@ export default function App() {
       {/* Particle Canvas */}
       <canvas ref={canvasRef} className="particle-canvas" />
 
-      {/* Header */}
-      <header className="flex items-center justify-between px-3 py-2 shrink-0">
-        <h1 className="title-gradient font-bold text-lg md:text-2xl" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-          NEON CYBER SPIN
+      {/* Header with glass effect */}
+      <header className="flex items-center justify-between px-2 sm:px-3 py-2 shrink-0 safe-area-top glass-panel mx-2 mt-2 rounded-xl">
+        <h1 className="title-gradient font-bold text-sm sm:text-lg md:text-2xl tracking-wider" style={{ fontFamily: 'Orbitron, sans-serif' }}>
+          NEON CYBER
         </h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-end">
           {/* Jackpot */}
-          <div className="jackpot-bar px-3 py-1 rounded-full text-xs font-bold text-black">
+          <div className="jackpot-bar px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold text-black">
             🎰 {Math.floor(jackpotAmount).toLocaleString()}
           </div>
           {/* Free spins counter */}
           {freeSpins > 0 && (
-            <div className="free-spins-active px-3 py-1 rounded-full text-xs font-bold bg-black/50 border border-yellow-400 text-yellow-400">
-              🌀 FREE: {freeSpins}
+            <div className="free-spins-active px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-black/50 border border-yellow-400 text-yellow-400">
+              🌀 {freeSpins}
             </div>
           )}
           {/* Auto spin */}
           {autoSpins > 0 && (
-            <div className="px-3 py-1 rounded-full text-xs font-bold bg-black/50 border border-cyan-400 text-cyan-400">
-              AUTO: {autoSpins}/{autoSpinTotal}
+            <div className="hidden sm:block px-2 py-0.5 rounded-full text-[10px] font-bold bg-black/50 border border-cyan-400 text-cyan-400">
+              AUTO: {autoSpins}
             </div>
           )}
           {/* Speed indicator when in debt */}
           {debt > 0 && (
-            <div className="px-2 py-1 rounded-full text-xs font-bold bg-red-900/50 border border-red-500 text-red-400 animate-pulse">
-              ⚡ x{(1 / getReelSpeedMultiplier()).toFixed(1)} SPEED
+            <div className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-900/50 border border-red-500 text-red-400 animate-pulse">
+              ⚡x{(1 / getReelSpeedMultiplier()).toFixed(1)}
             </div>
           )}
           {/* Exit button - "фиксируем прибыль" */}
           <button 
-            className="px-3 py-1.5 rounded-lg text-xs font-bold text-green-400 border border-green-500/50 bg-green-500/10 hover:bg-green-500/20 hover:border-green-400 hover:shadow-[0_0_10px_rgba(0,255,136,0.3)] transition-all active:scale-95"
+            className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold text-green-400 border border-green-500/50 bg-green-500/10 hover:bg-green-500/20 hover:border-green-400 hover:shadow-[0_0_10px_rgba(0,255,136,0.3)] transition-all active:scale-95 whitespace-nowrap"
             onClick={handleExit}
             title="Выйти на главный экран"
             style={{ fontFamily: 'Share Tech Mono' }}
           >
-            💰 фиксируем прибыль
+            💰 <span className="hidden sm:inline">фиксируем прибыль</span><span className="sm:hidden">забрать</span>
           </button>
         </div>
       </header>
@@ -959,18 +1052,27 @@ export default function App() {
         </div>
       )}
 
-      {/* Game Field */}
-      <div className="flex-1 flex items-center justify-center px-2 py-2 min-h-0">
-        <div className={`relative rounded-xl p-2 border-2 ${
+      {/* Game Field with enhanced design */}
+      <div className="flex-1 flex items-center justify-center px-2 sm:px-4 py-2 min-h-0">
+        <div className={`relative rounded-2xl p-2 sm:p-3 border-2 transition-all duration-500 ${
           freeSpinsActive 
-            ? 'border-yellow-400 shadow-[0_0_20px_rgba(255,215,0,0.5)]' 
+            ? 'border-yellow-400 shadow-[0_0_30px_rgba(255,215,0,0.5),0_0_60px_rgba(255,215,0,0.2)]' 
             : debt > 0 
-              ? 'border-red-500 shadow-[0_0_15px_rgba(255,51,102,0.3)]'
-              : 'border-cyan-500 shadow-[0_0_15px_rgba(0,240,255,0.3)]'
-        }`} style={{ background: 'linear-gradient(135deg, #0f1535 0%, #0a0e27 100%)' }}>
-          <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
-            boxShadow: 'inset 0 0 20px rgba(255, 0, 234, 0.1)'
+              ? 'border-red-500 shadow-[0_0_20px_rgba(255,51,102,0.4),0_0_40px_rgba(255,51,102,0.2)]'
+              : 'border-cyan-500/70 shadow-[0_0_20px_rgba(0,240,255,0.3),0_0_40px_rgba(0,240,255,0.1)]'
+        }`} style={{ 
+          background: 'linear-gradient(135deg, rgba(15, 21, 53, 0.9) 0%, rgba(10, 14, 39, 0.95) 100%)',
+          backdropFilter: 'blur(10px)',
+        }}>
+          {/* Inner glow effect */}
+          <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{
+            boxShadow: 'inset 0 0 30px rgba(255, 0, 234, 0.08), inset 0 0 60px rgba(0, 240, 255, 0.05)'
           }} />
+          {/* Corner decorations */}
+          <div className="absolute top-1 left-1 w-3 h-3 border-t-2 border-l-2 border-cyan-400/50 rounded-tl" />
+          <div className="absolute top-1 right-1 w-3 h-3 border-t-2 border-r-2 border-cyan-400/50 rounded-tr" />
+          <div className="absolute bottom-1 left-1 w-3 h-3 border-b-2 border-l-2 border-cyan-400/50 rounded-bl" />
+          <div className="absolute bottom-1 right-1 w-3 h-3 border-b-2 border-r-2 border-cyan-400/50 rounded-br" />
           
           {/* Reels */}
           <div className="flex gap-1 relative">
@@ -1037,55 +1139,51 @@ export default function App() {
         </div>
       </div>
 
-      {/* Control Panel */}
-      <div className="shrink-0 px-3 pb-3 pt-2">
-        {/* Info row */}
-        <div className="flex items-center justify-between gap-2 mb-2">
-          <div className="text-center">
-            <div className="text-[10px] text-cyan-300 uppercase">Баланс</div>
-            <div className="text-sm font-bold text-cyan-400 neon-text-cyan">
-              {Math.floor(balance).toLocaleString()}
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-[10px] text-yellow-300 uppercase">Ставка</div>
-            <div className="text-sm font-bold text-yellow-400 neon-text-yellow">
-              {bet.toLocaleString()}
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-[10px] text-green-300 uppercase">Выигрыш</div>
-            <div className={`text-sm font-bold text-green-400 ${lastWin > 0 ? 'neon-text-cyan' : ''}`}
-              style={{ textShadow: lastWin > 0 ? '0 0 7px #00ff88' : undefined }}>
-              {lastWin > 0 ? `+${lastWin.toLocaleString()}` : '0'}
-            </div>
-          </div>
-          {debt > 0 && (
-            <div className={`text-center ${debt > 1000 ? 'debt-warning border border-red-500 rounded px-2' : ''}`}>
-              <div className="text-[10px] text-red-300 uppercase">⚠️ Долг</div>
-              <div className="text-sm font-bold text-red-400" style={{ textShadow: '0 0 7px #ff3366' }}>
-                {Math.floor(debt).toLocaleString()}
+      {/* Control Panel with glass effect */}
+      <div className="shrink-0 px-3 pb-3 pt-2 safe-area-bottom">
+        {/* Info row with glass panel */}
+        <div className="glass-panel p-3 mb-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-center flex-1">
+              <div className="text-[9px] sm:text-[10px] text-cyan-300/70 uppercase tracking-wider font-bold">Баланс</div>
+              <div className="text-sm sm:text-base font-black text-cyan-400 neon-text-cyan" style={{ fontFamily: 'Share Tech Mono' }}>
+                {Math.floor(balance).toLocaleString()}
               </div>
             </div>
-          )}
+            <div className="w-px h-8 bg-white/10" />
+            <div className="text-center flex-1">
+              <div className="text-[9px] sm:text-[10px] text-yellow-300/70 uppercase tracking-wider font-bold">Ставка</div>
+              <div className="text-sm sm:text-base font-black text-yellow-400 neon-text-yellow" style={{ fontFamily: 'Share Tech Mono' }}>
+                {bet.toLocaleString()}
+              </div>
+            </div>
+            <div className="w-px h-8 bg-white/10" />
+            <div className="text-center flex-1">
+              <div className="text-[9px] sm:text-[10px] text-green-300/70 uppercase tracking-wider font-bold">Выигрыш</div>
+              <div className={`text-sm sm:text-base font-black ${lastWin > 0 ? 'text-green-400 neon-text-green' : 'text-green-400/50'}`}
+                style={{ fontFamily: 'Share Tech Mono' }}>
+                {lastWin > 0 ? `+${lastWin.toLocaleString()}` : '0'}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Buttons row */}
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-3">
           {/* Bet controls */}
-          <div className="flex flex-col items-center gap-1">
-            <button className="ctrl-btn" onClick={() => changeBet(1)} disabled={spinning}>
+          <div className="flex flex-col items-center gap-1.5">
+            <button className="ctrl-btn w-10 h-10 flex items-center justify-center text-lg font-bold" onClick={() => changeBet(1)} disabled={spinning}>
               +
             </button>
-            <button className="ctrl-btn text-[10px]" onClick={setMaxBet} disabled={spinning}>
+            <button className="ctrl-btn text-[9px] font-bold px-2 py-1" onClick={setMaxBet} disabled={spinning}>
               MAX
             </button>
-            <button className="ctrl-btn" onClick={() => changeBet(-1)} disabled={spinning}>
+            <button className="ctrl-btn w-10 h-10 flex items-center justify-center text-lg font-bold" onClick={() => changeBet(-1)} disabled={spinning}>
               -
             </button>
           </div>
 
-          {/* SPIN button */}
+          {/* SPIN button - enhanced */}
           <button
             className={`spin-btn ${spinning ? 'spinning' : ''}`}
             onClick={doSpin}
@@ -1095,35 +1193,35 @@ export default function App() {
           </button>
 
           {/* Side controls */}
-          <div className="flex flex-col items-center gap-1">
-            <button className="ctrl-btn" onClick={() => audioRef.current.toggleMute()}>
+          <div className="flex flex-col items-center gap-1.5">
+            <button className="ctrl-btn w-10 h-10 flex items-center justify-center" onClick={() => audioRef.current.toggleMute()}>
               {audioRef.current.isMuted() ? '🔇' : '🔊'}
             </button>
-            <button className="ctrl-btn text-[10px]" onClick={() => setShowPaytable(true)}>
+            <button className="ctrl-btn text-sm w-10 h-10 flex items-center justify-center" onClick={() => setShowPaytable(true)}>
               📋
             </button>
-            <button className="ctrl-btn text-[10px]" onClick={() => setShowStats(true)}>
+            <button className="ctrl-btn text-sm w-10 h-10 flex items-center justify-center" onClick={() => setShowStats(true)}>
               📊
             </button>
           </div>
         </div>
 
         {/* Auto spin & Achievements */}
-        <div className="flex items-center justify-center gap-2 mt-2">
+        <div className="flex items-center justify-center gap-2 mt-3">
           {autoSpins > 0 ? (
-            <button className="ctrl-btn border-red-500 text-red-400" onClick={stopAutoSpin}>
-              ⏹ STOP AUTO
+            <button className="ctrl-btn border-red-500/50 text-red-400 px-4 py-2 font-bold" onClick={stopAutoSpin}>
+              ⏹ STOP
             </button>
           ) : (
-            <div className="flex gap-1">
+            <div className="flex gap-1.5 flex-wrap justify-center">
               {CONFIG.AUTO_SPIN_OPTIONS.map(n => (
-                <button key={n} className="ctrl-btn text-[10px]" onClick={() => startAutoSpin(n)} disabled={spinning}>
+                <button key={n} className="ctrl-btn text-[10px] px-3 py-1.5 font-bold" onClick={() => startAutoSpin(n)} disabled={spinning}>
                   AUTO {n}
                 </button>
               ))}
             </div>
           )}
-          <button className="ctrl-btn text-[10px]" onClick={() => setShowAchievements(true)}>
+          <button className="ctrl-btn text-sm px-3 py-2" onClick={() => setShowAchievements(true)}>
             🏆
           </button>
         </div>
@@ -1268,6 +1366,82 @@ export default function App() {
         <div className="fixed inset-0 pointer-events-none z-[2500] flex items-center justify-center">
           <div className="text-3xl font-bold text-green-400 animate-ping" style={{ fontFamily: 'Orbitron' }}>
             ✅ ДОЛГ ПОГАШЕН!
+          </div>
+        </div>
+      )}
+
+      {/* Fixed debt indicator - bottom right corner */}
+      {debt > 0 && (
+        <div className="debt-indicator-fixed">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">💳</span>
+            <div>
+              <div className="text-[9px] uppercase tracking-wider text-red-300 font-bold">ДОЛГ</div>
+              <div className="text-base font-black text-red-400 neon-text-red" style={{ fontFamily: 'Share Tech Mono' }}>
+                {Math.floor(debt).toLocaleString()}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Exit Summary Modal */}
+      {showExitSummary && exitResult && (
+        <div className="modal-backdrop">
+          <div className={`exit-summary-modal ${exitResult.type}`}>
+            <div className="text-5xl mb-4">
+              {exitResult.type === 'profit' ? '🎉' : '💸'}
+            </div>
+            <h2 
+              className={`text-2xl font-black mb-2 ${
+                exitResult.type === 'profit' ? 'text-green-400 neon-text-green' : 'text-red-400 neon-text-red'
+              }`}
+              style={{ fontFamily: 'Orbitron' }}
+            >
+              {exitResult.type === 'profit' ? 'ВЫ В ПЛЮСЕ!' : 'ВЫ В МИНУСЕ!'}
+            </h2>
+            <p className="text-gray-400 text-sm mb-6">
+              {exitResult.type === 'profit' 
+                ? 'Поздравляем! Вы выиграли:' 
+                : 'К сожалению, вы задолжали:'}
+            </p>
+            <div className="count-up">
+              <div 
+                className={`text-5xl font-black mb-2 ${
+                  exitResult.type === 'profit' ? 'text-green-400' : 'text-red-400'
+                }`}
+                style={{ fontFamily: 'Share Tech Mono' }}
+              >
+                {exitResult.type === 'profit' ? '+' : '-'}
+                {exitResult.amount.toLocaleString()}
+              </div>
+              <div className="text-xs text-gray-500 uppercase tracking-wider">кредитов</div>
+            </div>
+            
+            {/* Stats preview */}
+            <div className="mt-6 pt-4 border-t border-white/10 grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <div className="text-gray-500">Баланс</div>
+                <div className="text-cyan-400 font-bold">{Math.floor(balance).toLocaleString()}</div>
+              </div>
+              <div>
+                <div className="text-gray-500">Спинов</div>
+                <div className="text-white font-bold">{statsRef.current.stats.totalSpins}</div>
+              </div>
+            </div>
+            
+            <button
+              className="mt-6 px-8 py-3 rounded-full font-bold text-sm transition-all active:scale-95 border-2"
+              style={{ 
+                fontFamily: 'Orbitron',
+                borderColor: exitResult.type === 'profit' ? 'var(--neon-green)' : 'var(--neon-red)',
+                color: exitResult.type === 'profit' ? 'var(--neon-green)' : 'var(--neon-red)',
+                background: exitResult.type === 'profit' ? 'rgba(0, 255, 136, 0.1)' : 'rgba(255, 51, 102, 0.1)',
+              }}
+              onClick={confirmExit}
+            >
+              {exitResult.type === 'profit' ? '🎰 Забрать выигрыш' : '🚪 Выйти'}
+            </button>
           </div>
         </div>
       )}

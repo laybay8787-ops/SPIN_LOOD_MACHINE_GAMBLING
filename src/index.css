@@ -350,30 +350,88 @@ html, body {
   border-radius: 3px;
 }
 
-/* Responsive */
-@media (max-width: 480px) {
+/* Responsive - Mobile First */
+@media (max-width: 360px) {
   :root {
-    --cell-size: 55px;
+    --cell-size: 50px;
+  }
+  .spin-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 0.65rem;
+  }
+  .big-win-text {
+    font-size: 2rem;
+  }
+}
+
+@media (min-width: 361px) and (max-width: 480px) {
+  :root {
+    --cell-size: 58px;
+  }
+  .spin-btn {
+    width: 68px;
+    height: 68px;
+    font-size: 0.7rem;
+  }
+  .big-win-text {
+    font-size: 2.2rem;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 767px) {
+  :root {
+    --cell-size: 70px;
+  }
+  .spin-btn {
+    width: 75px;
+    height: 75px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --cell-size: 85px;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  :root {
+    --cell-size: 95px;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --cell-size: 105px;
+  }
+}
+
+/* Landscape orientation for mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  :root {
+    --cell-size: 60px;
   }
   .spin-btn {
     width: 65px;
     height: 65px;
-    font-size: 0.7rem;
-  }
-  .big-win-text {
-    font-size: 2.5rem;
   }
 }
 
-@media (min-width: 768px) {
-  :root {
-    --cell-size: 80px;
+/* Tablet optimizations */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .ctrl-btn {
+    padding: 8px 14px;
+    font-size: 0.8rem;
   }
 }
 
-@media (min-width: 1024px) {
-  :root {
-    --cell-size: 90px;
+/* Touch-friendly for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .ctrl-btn,
+  .spin-btn {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 
@@ -488,4 +546,125 @@ html, body {
 
 .loan-flash {
   animation: loanFlash 0.5s ease-in-out 3;
+}
+
+/* Fixed debt indicator - bottom right */
+.debt-indicator-fixed {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  z-index: 100;
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 51, 102, 0.15) 0%, rgba(255, 0, 234, 0.1) 100%);
+  border: 2px solid var(--neon-red);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px rgba(255, 51, 102, 0.4), inset 0 0 10px rgba(255, 51, 102, 0.1);
+  animation: debtPulseIndicator 2s ease-in-out infinite;
+}
+
+@keyframes debtPulseIndicator {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(255, 51, 102, 0.4), inset 0 0 10px rgba(255, 51, 102, 0.1);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(255, 51, 102, 0.6), inset 0 0 15px rgba(255, 51, 102, 0.2);
+    transform: scale(1.02);
+  }
+}
+
+/* Exit summary modal */
+.exit-summary-modal {
+  background: linear-gradient(135deg, var(--bg-panel) 0%, rgba(15, 21, 53, 0.98) 100%);
+  border: 2px solid;
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 90vw;
+  width: 400px;
+  text-align: center;
+  animation: modalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.exit-summary-modal.profit {
+  border-color: var(--neon-green);
+  box-shadow: 0 0 40px rgba(0, 255, 136, 0.3), inset 0 0 20px rgba(0, 255, 136, 0.05);
+}
+
+.exit-summary-modal.loss {
+  border-color: var(--neon-red);
+  box-shadow: 0 0 40px rgba(255, 51, 102, 0.3), inset 0 0 20px rgba(255, 51, 102, 0.05);
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.8); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.count-up {
+  animation: countUp 0.6s ease-out forwards;
+}
+
+/* Enhanced glassmorphism effects */
+.glass-panel {
+  background: rgba(17, 24, 66, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  border-radius: 16px;
+}
+
+/* Improved button hover effects */
+.ctrl-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.ctrl-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(0, 240, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.ctrl-btn:hover::before {
+  width: 200%;
+  height: 200%;
+}
+
+/* Smooth transitions for all interactive elements */
+button, .ctrl-btn, .spin-btn {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced neon text effects */
+.neon-text-green {
+  text-shadow: 0 0 7px var(--neon-green), 0 0 10px var(--neon-green), 0 0 21px var(--neon-green);
+}
+
+.neon-text-red {
+  text-shadow: 0 0 7px var(--neon-red), 0 0 10px var(--neon-red), 0 0 21px var(--neon-red);
+}
+
+/* Improved scrollbar for mobile */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+/* Safe area for mobile devices */
+@supports (padding: max(0px)) {
+  .safe-area-bottom {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .safe-area-top {
+    padding-top: max(8px, env(safe-area-inset-top));
+  }
 }
