@@ -461,7 +461,8 @@ export default function App() {
     let currentBalance = balanceRef.current;
     let loansTaken = 0;
     
-    while (currentBalance < neededAmount && loanRef.current.canBorrow()) {
+    // БЕЗЛИМИТНЫЙ ДОЛГ — берём кредиты пока не наберём нужную сумму
+    while (currentBalance < neededAmount) {
       const result = loanRef.current.borrow();
       if (result.success) {
         currentBalance += result.amount;
@@ -480,8 +481,8 @@ export default function App() {
       
       showToast('🏦', `Автокредит: +${loansTaken * CONFIG.LOAN_AMOUNT} (долг: ${Math.floor(loanRef.current.state.debt)})`);
       
-      // Check debtor achievement
-      if (loanRef.current.state.loanCount >= CONFIG.MAX_LOANS) {
+      // Check debtor achievement (after 5 loans)
+      if (loanRef.current.state.loanCount >= 5) {
         if (achievementsRef.current.check('debtor', true)) {
           showToast('🏦', 'Достижение: Должник!');
         }
@@ -500,16 +501,9 @@ export default function App() {
     const currentBet = CONFIG.BET_LEVELS[betIndex];
     
     // Check balance (skip for free spins)
+    // АВТОКРЕДИТ: если не хватает — берём кредит БЕЗ ЛИМИТА
     if (freeSpinsRef.current <= 0 && balanceRef.current < currentBet) {
-      // Try auto loan
-      const canCover = autoLoan(currentBet);
-      if (!canCover) {
-        // Can't cover — show message
-        if (loanRef.current.state.loanCount >= CONFIG.MAX_LOANS) {
-          showToast('⛔', 'Лимит займов исчерпан! Снизьте ставку.');
-        }
-        return;
-      }
+      autoLoan(currentBet);
     }
 
     setSpinning(true);
@@ -692,17 +686,13 @@ export default function App() {
       }
     }
 
-    // Handle auto spins
+    // Handle auto spins (долг безлимитный — всегда продолжаем)
     if (autoSpinsRef.current > 0 && freeSpinsRef.current <= 0) {
       const remaining = autoSpinsRef.current - 1;
       setAutoSpins(remaining);
-      const currentBal = balanceRef.current - currentBet + finalWin;
-      if (remaining > 0 && currentBal >= CONFIG.BET_LEVELS[betIndex]) {
-        setTimeout(() => doSpin(), 1000);
-      } else if (remaining > 0 && loanRef.current.canBorrow()) {
+      if (remaining > 0) {
         setTimeout(() => doSpin(), 1000);
       } else {
-        setAutoSpins(0);
         setAutoSpinTotal(0);
       }
     }
@@ -1099,7 +1089,7 @@ export default function App() {
           <button
             className={`spin-btn ${spinning ? 'spinning' : ''}`}
             onClick={doSpin}
-            disabled={spinning || (balance < bet && freeSpins <= 0 && loanCount >= CONFIG.MAX_LOANS)}
+            disabled={spinning}
           >
             {spinning ? '...' : freeSpins > 0 ? 'FREE' : 'SPIN'}
           </button>

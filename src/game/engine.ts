@@ -473,8 +473,11 @@ export class LoanSystem {
     this.state = this.load() || { debt: 0, loanCount: 0, totalBorrowed: 0 };
   }
 
+  /**
+   * Долг БЕЗ ПРЕГРАД — пользователь может брать кредиты бесконечно
+   */
   canBorrow(): boolean {
-    return this.state.loanCount < CONFIG.MAX_LOANS;
+    return true; // Безлимитный долг
   }
 
   borrow(): { success: boolean; amount: number; debt: number } {
