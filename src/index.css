@@ -149,18 +149,30 @@ html, body {
 
 /* Spin button */
 .spin-btn {
-  width: 80px;
-  height: 80px;
   border-radius: 50%;
   border: 3px solid var(--neon-cyan);
   background: radial-gradient(circle, rgba(0, 240, 255, 0.2) 0%, rgba(0, 240, 255, 0.05) 100%);
   color: var(--neon-cyan);
   font-family: 'Orbitron', sans-serif;
   font-weight: 700;
-  font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 0 15px rgba(0, 240, 255, 0.3), inset 0 0 15px rgba(0, 240, 255, 0.1);
+}
+
+/* Desktop - larger buttons */
+@media (min-width: 1024px) {
+  .spin-btn {
+    font-size: 1.1rem;
+    border-width: 4px;
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.4), inset 0 0 20px rgba(0, 240, 255, 0.15);
+  }
+  
+  .ctrl-btn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    border-width: 2px;
+  }
 }
 
 .spin-btn:hover:not(:disabled) {
@@ -548,29 +560,13 @@ html, body {
   animation: loanFlash 0.5s ease-in-out 3;
 }
 
-/* Fixed debt indicator - bottom right */
-.debt-indicator-fixed {
-  position: fixed;
-  bottom: 12px;
-  right: 12px;
-  z-index: 100;
-  padding: 8px 16px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(255, 51, 102, 0.15) 0%, rgba(255, 0, 234, 0.1) 100%);
-  border: 2px solid var(--neon-red);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 20px rgba(255, 51, 102, 0.4), inset 0 0 10px rgba(255, 51, 102, 0.1);
-  animation: debtPulseIndicator 2s ease-in-out infinite;
-}
-
+/* Debt indicator pulse animation */
 @keyframes debtPulseIndicator {
   0%, 100% { 
-    box-shadow: 0 0 20px rgba(255, 51, 102, 0.4), inset 0 0 10px rgba(255, 51, 102, 0.1);
-    transform: scale(1);
+    box-shadow: 0 0 10px rgba(255, 51, 102, 0.3);
   }
   50% { 
-    box-shadow: 0 0 30px rgba(255, 51, 102, 0.6), inset 0 0 15px rgba(255, 51, 102, 0.2);
-    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
   }
 }
 

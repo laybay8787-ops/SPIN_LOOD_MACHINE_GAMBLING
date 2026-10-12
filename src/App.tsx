@@ -226,6 +226,8 @@ function easeOutQuart(t: number): number {
 function StartScreen({ onEnter, onExit }: { onEnter: (balance: number) => void; onExit: () => void }) {
   const [selectedBalance, setSelectedBalance] = useState<number>(CONFIG.START_BALANCE_OPTIONS[1] as number);
   const [hoveredOption, setHoveredOption] = useState<number | null>(null);
+  const [passportNumber, setPassportNumber] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center grid-bg relative overflow-hidden safe-area-top safe-area-bottom">
@@ -279,8 +281,52 @@ function StartScreen({ onEnter, onExit }: { onEnter: (balance: number) => void; 
         </p>
       </div>
 
-      {/* Balance selection with glass effect */}
+      {/* Passport authentication */}
+      {!isAuthenticated ? (
+        <div className="z-10 text-center mb-8 px-4 w-full max-w-lg">
+          <div className="glass-panel p-6">
+            <div className="text-4xl mb-3">🛂</div>
+            <h2 className="text-cyan-400 text-base sm:text-lg mb-4 font-bold tracking-wide" style={{ fontFamily: 'Orbitron' }}>
+              АВТОРИЗАЦИЯ
+            </h2>
+            <p className="text-gray-400 text-xs mb-4">Введите номер паспорта для входа</p>
+            <input
+              type="text"
+              placeholder="XX XX XXXXXX"
+              value={passportNumber}
+              onChange={(e) => setPassportNumber(e.target.value)}
+              className="w-full px-4 py-3 rounded-lg bg-black/50 border border-cyan-500/30 text-cyan-300 text-center text-lg font-bold focus:outline-none focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-all"
+              style={{ fontFamily: 'Share Tech Mono' }}
+              maxLength={12}
+            />
+            <button
+              className="mt-4 px-8 py-3 rounded-lg font-bold text-sm transition-all border-2 border-cyan-400 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20 hover:shadow-[0_0_20px_rgba(0,240,255,0.3)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ fontFamily: 'Orbitron' }}
+              onClick={() => {
+                if (passportNumber.trim().length > 0) {
+                  setIsAuthenticated(true);
+                }
+              }}
+              disabled={passportNumber.trim().length === 0}
+            >
+              ✓ ПОДТВЕРДИТЬ
+            </button>
+            <p className="text-gray-600 text-[10px] mt-3">* Это просто шутка, можно ввести что угодно</p>
+          </div>
+        </div>
+      ) : (
+      /* Balance selection with glass effect */
       <div className="z-10 text-center mb-8 px-4 w-full max-w-lg">
+        <div className="text-xs text-green-400 mb-3 flex items-center justify-center gap-2">
+          <span>✓</span>
+          <span>Паспорт: {passportNumber}</span>
+          <button 
+            className="text-gray-500 hover:text-red-400 ml-2"
+            onClick={() => { setIsAuthenticated(false); setPassportNumber(''); }}
+          >
+            ✕
+          </button>
+        </div>
         <h2 className="text-cyan-400 text-base sm:text-lg mb-5 font-bold tracking-wide" style={{ fontFamily: 'Orbitron' }}>
           💰 ВЫБЕРИТЕ СУММУ
         </h2>
@@ -311,16 +357,18 @@ function StartScreen({ onEnter, onExit }: { onEnter: (balance: number) => void; 
           </div>
         </div>
       </div>
+      )}
 
       {/* Enter button with enhanced effects */}
       <div className="z-10 flex flex-col items-center gap-5 px-4">
         <button
-          className="group relative px-12 py-5 rounded-full font-black text-lg sm:text-xl transition-all duration-300 border-2 border-cyan-400 bg-gradient-to-r from-cyan-400/10 via-cyan-500/20 to-cyan-400/10 text-cyan-300 hover:from-cyan-400/20 hover:via-cyan-500/30 hover:to-cyan-400/20 hover:shadow-[0_0_40px_rgba(0,240,255,0.5)] active:scale-95 overflow-hidden"
+          className="group relative px-12 sm:px-16 lg:px-20 py-5 sm:py-6 rounded-full font-black text-lg sm:text-xl lg:text-2xl transition-all duration-300 border-2 border-cyan-400 bg-gradient-to-r from-cyan-400/10 via-cyan-500/20 to-cyan-400/10 text-cyan-300 hover:from-cyan-400/20 hover:via-cyan-500/30 hover:to-cyan-400/20 hover:shadow-[0_0_40px_rgba(0,240,255,0.5)] active:scale-95 overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
           style={{ fontFamily: 'Orbitron' }}
           onClick={() => onEnter(selectedBalance)}
+          disabled={!isAuthenticated}
         >
           <span className="relative z-10 flex items-center gap-3">
-            <span className="text-2xl">🎰</span>
+            <span className="text-2xl sm:text-3xl">🎰</span>
             <span>ВОЙТИ В КАЗИНО</span>
           </span>
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
@@ -338,13 +386,11 @@ function StartScreen({ onEnter, onExit }: { onEnter: (balance: number) => void; 
         </button>
       </div>
 
-      {/* Footer info with glass effect */}
-      <div className="absolute bottom-4 left-0 right-0 text-center z-10 px-4">
-        <div className="inline-block glass-panel px-4 py-2">
-          <p className="text-gray-500 text-xs tracking-wide">
-            🎮 Демо-версия • Играйте ответственно • 18+
-          </p>
-        </div>
+      {/* Footer info - compact */}
+      <div className="absolute bottom-2 left-0 right-0 text-center z-10 px-4">
+        <p className="text-gray-600 text-[10px] tracking-wide opacity-60">
+          Демо • 18+
+        </p>
       </div>
 
       {/* Decorative floating elements */}
@@ -544,7 +590,9 @@ export default function App() {
     }
     
     if (loansTaken > 0) {
+      // Обновляем и state, и ref синхронно
       setBalance(currentBalance);
+      balanceRef.current = currentBalance; // Важно для последующих операций
       setLoanCount(loanRef.current.state.loanCount);
       setDebt(loanRef.current.state.debt);
       audioRef.current.playLoanTaken();
@@ -1140,27 +1188,27 @@ export default function App() {
       </div>
 
       {/* Control Panel with glass effect */}
-      <div className="shrink-0 px-3 pb-3 pt-2 safe-area-bottom">
+      <div className="shrink-0 px-3 sm:px-4 lg:px-6 pb-3 pt-2 safe-area-bottom">
         {/* Info row with glass panel */}
-        <div className="glass-panel p-3 mb-3">
-          <div className="flex items-center justify-between gap-2">
+        <div className="glass-panel p-3 sm:p-4 mb-3">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
             <div className="text-center flex-1">
-              <div className="text-[9px] sm:text-[10px] text-cyan-300/70 uppercase tracking-wider font-bold">Баланс</div>
-              <div className="text-sm sm:text-base font-black text-cyan-400 neon-text-cyan" style={{ fontFamily: 'Share Tech Mono' }}>
+              <div className="text-[9px] sm:text-xs text-cyan-300/70 uppercase tracking-wider font-bold">Баланс</div>
+              <div className="text-base sm:text-lg lg:text-xl font-black text-cyan-400 neon-text-cyan" style={{ fontFamily: 'Share Tech Mono' }}>
                 {Math.floor(balance).toLocaleString()}
               </div>
             </div>
-            <div className="w-px h-8 bg-white/10" />
+            <div className="w-px h-8 sm:h-10 bg-white/10" />
             <div className="text-center flex-1">
-              <div className="text-[9px] sm:text-[10px] text-yellow-300/70 uppercase tracking-wider font-bold">Ставка</div>
-              <div className="text-sm sm:text-base font-black text-yellow-400 neon-text-yellow" style={{ fontFamily: 'Share Tech Mono' }}>
+              <div className="text-[9px] sm:text-xs text-yellow-300/70 uppercase tracking-wider font-bold">Ставка</div>
+              <div className="text-base sm:text-lg lg:text-xl font-black text-yellow-400 neon-text-yellow" style={{ fontFamily: 'Share Tech Mono' }}>
                 {bet.toLocaleString()}
               </div>
             </div>
-            <div className="w-px h-8 bg-white/10" />
+            <div className="w-px h-8 sm:h-10 bg-white/10" />
             <div className="text-center flex-1">
-              <div className="text-[9px] sm:text-[10px] text-green-300/70 uppercase tracking-wider font-bold">Выигрыш</div>
-              <div className={`text-sm sm:text-base font-black ${lastWin > 0 ? 'text-green-400 neon-text-green' : 'text-green-400/50'}`}
+              <div className="text-[9px] sm:text-xs text-green-300/70 uppercase tracking-wider font-bold">Выигрыш</div>
+              <div className={`text-base sm:text-lg lg:text-xl font-black ${lastWin > 0 ? 'text-green-400 neon-text-green' : 'text-green-400/50'}`}
                 style={{ fontFamily: 'Share Tech Mono' }}>
                 {lastWin > 0 ? `+${lastWin.toLocaleString()}` : '0'}
               </div>
@@ -1169,23 +1217,23 @@ export default function App() {
         </div>
 
         {/* Buttons row */}
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex items-center justify-center gap-3 sm:gap-4 lg:gap-6">
           {/* Bet controls */}
-          <div className="flex flex-col items-center gap-1.5">
-            <button className="ctrl-btn w-10 h-10 flex items-center justify-center text-lg font-bold" onClick={() => changeBet(1)} disabled={spinning}>
+          <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+            <button className="ctrl-btn w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 flex items-center justify-center text-lg sm:text-xl font-bold" onClick={() => changeBet(1)} disabled={spinning}>
               +
             </button>
-            <button className="ctrl-btn text-[9px] font-bold px-2 py-1" onClick={setMaxBet} disabled={spinning}>
+            <button className="ctrl-btn text-[9px] sm:text-xs font-bold px-2 sm:px-3 py-1 sm:py-1.5" onClick={setMaxBet} disabled={spinning}>
               MAX
             </button>
-            <button className="ctrl-btn w-10 h-10 flex items-center justify-center text-lg font-bold" onClick={() => changeBet(-1)} disabled={spinning}>
+            <button className="ctrl-btn w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 flex items-center justify-center text-lg sm:text-xl font-bold" onClick={() => changeBet(-1)} disabled={spinning}>
               -
             </button>
           </div>
 
           {/* SPIN button - enhanced */}
           <button
-            className={`spin-btn ${spinning ? 'spinning' : ''}`}
+            className={`spin-btn w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 text-sm sm:text-base lg:text-lg ${spinning ? 'spinning' : ''}`}
             onClick={doSpin}
             disabled={spinning}
           >
@@ -1193,35 +1241,35 @@ export default function App() {
           </button>
 
           {/* Side controls */}
-          <div className="flex flex-col items-center gap-1.5">
-            <button className="ctrl-btn w-10 h-10 flex items-center justify-center" onClick={() => audioRef.current.toggleMute()}>
+          <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+            <button className="ctrl-btn w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 flex items-center justify-center text-sm sm:text-base" onClick={() => audioRef.current.toggleMute()}>
               {audioRef.current.isMuted() ? '🔇' : '🔊'}
             </button>
-            <button className="ctrl-btn text-sm w-10 h-10 flex items-center justify-center" onClick={() => setShowPaytable(true)}>
+            <button className="ctrl-btn text-sm sm:text-base w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 flex items-center justify-center" onClick={() => setShowPaytable(true)}>
               📋
             </button>
-            <button className="ctrl-btn text-sm w-10 h-10 flex items-center justify-center" onClick={() => setShowStats(true)}>
+            <button className="ctrl-btn text-sm sm:text-base w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 flex items-center justify-center" onClick={() => setShowStats(true)}>
               📊
             </button>
           </div>
         </div>
 
         {/* Auto spin & Achievements */}
-        <div className="flex items-center justify-center gap-2 mt-3">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 mt-3">
           {autoSpins > 0 ? (
-            <button className="ctrl-btn border-red-500/50 text-red-400 px-4 py-2 font-bold" onClick={stopAutoSpin}>
+            <button className="ctrl-btn border-red-500/50 text-red-400 px-4 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold" onClick={stopAutoSpin}>
               ⏹ STOP
             </button>
           ) : (
-            <div className="flex gap-1.5 flex-wrap justify-center">
+            <div className="flex gap-1.5 sm:gap-2 flex-wrap justify-center">
               {CONFIG.AUTO_SPIN_OPTIONS.map(n => (
-                <button key={n} className="ctrl-btn text-[10px] px-3 py-1.5 font-bold" onClick={() => startAutoSpin(n)} disabled={spinning}>
+                <button key={n} className="ctrl-btn text-[10px] sm:text-xs px-3 sm:px-4 py-1.5 sm:py-2 font-bold" onClick={() => startAutoSpin(n)} disabled={spinning}>
                   AUTO {n}
                 </button>
               ))}
             </div>
           )}
-          <button className="ctrl-btn text-sm px-3 py-2" onClick={() => setShowAchievements(true)}>
+          <button className="ctrl-btn text-sm sm:text-base px-3 sm:px-4 py-2 sm:py-2.5" onClick={() => setShowAchievements(true)}>
             🏆
           </button>
         </div>
@@ -1370,16 +1418,13 @@ export default function App() {
         </div>
       )}
 
-      {/* Fixed debt indicator - bottom right corner */}
+      {/* Fixed debt indicator - compact, bottom right */}
       {debt > 0 && (
-        <div className="debt-indicator-fixed">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">💳</span>
-            <div>
-              <div className="text-[9px] uppercase tracking-wider text-red-300 font-bold">ДОЛГ</div>
-              <div className="text-base font-black text-red-400 neon-text-red" style={{ fontFamily: 'Share Tech Mono' }}>
-                {Math.floor(debt).toLocaleString()}
-              </div>
+        <div className="fixed bottom-2 right-2 z-50 px-3 py-1.5 rounded-lg bg-red-950/80 border border-red-500/50 backdrop-blur-sm shadow-lg shadow-red-500/20">
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm">💳</span>
+            <div className="text-xs font-bold text-red-400" style={{ fontFamily: 'Share Tech Mono' }}>
+              {Math.floor(debt).toLocaleString()}
             </div>
           </div>
         </div>
