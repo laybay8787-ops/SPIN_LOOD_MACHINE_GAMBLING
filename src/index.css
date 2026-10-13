@@ -604,7 +604,7 @@ html, body {
   }
 }
 
-/* Cyber Monkey - runs around the reels */
+/* Cyber Monkey - flies around the reels (OUTSIDE only!) */
 .cyber-monkey {
   position: absolute;
   width: 60px;
@@ -616,7 +616,7 @@ html, body {
   align-items: center;
   justify-content: center;
   filter: drop-shadow(0 0 15px #00f0ff) drop-shadow(0 0 25px #ff00ea);
-  animation: monkeyRun 6s linear infinite;
+  animation: monkeyFly 6s linear infinite;
 }
 
 .cyber-monkey::before {
@@ -633,49 +633,52 @@ html, body {
   50% { opacity: 1; transform: scale(1.2); }
 }
 
-@keyframes monkeyRun {
+/* Fly around the perimeter - NEVER inside the reels */
+@keyframes monkeyFly {
   0% {
-    top: 10%;
-    left: -70px;
-    transform: rotate(0deg) scaleX(1);
+    top: -80px;
+    left: -80px;
+    transform: rotate(0deg) scale(1);
   }
-  24% {
-    top: 10%;
-    left: calc(100% + 10px);
-    transform: rotate(15deg) scaleX(1);
+  12% {
+    top: -80px;
+    left: 50%;
+    transform: rotate(10deg) scale(1.1);
   }
   25% {
-    top: 10%;
-    right: -70px;
-    left: auto;
-    transform: rotate(15deg) scaleX(-1);
+    top: -80px;
+    left: calc(100% + 20px);
+    transform: rotate(20deg) scale(1);
   }
-  49% {
-    top: calc(100% - 70px);
-    right: -70px;
-    left: auto;
-    transform: rotate(-15deg) scaleX(-1);
+  37% {
+    top: 50%;
+    left: calc(100% + 20px);
+    transform: rotate(90deg) scale(1.1);
   }
   50% {
-    top: calc(100% - 70px);
-    right: auto;
-    left: -70px;
-    transform: rotate(-15deg) scaleX(1);
+    top: calc(100% + 20px);
+    left: calc(100% + 20px);
+    transform: rotate(180deg) scale(1);
   }
-  74% {
-    top: calc(100% - 70px);
-    left: calc(100% + 10px);
-    transform: rotate(15deg) scaleX(1);
+  62% {
+    top: calc(100% + 20px);
+    left: 50%;
+    transform: rotate(190deg) scale(1.1);
   }
   75% {
-    top: calc(100% - 70px);
-    left: -70px;
-    transform: rotate(15deg) scaleX(1);
+    top: calc(100% + 20px);
+    left: -80px;
+    transform: rotate(200deg) scale(1);
+  }
+  87% {
+    top: 50%;
+    left: -80px;
+    transform: rotate(270deg) scale(1.1);
   }
   100% {
-    top: 10%;
-    left: -70px;
-    transform: rotate(0deg) scaleX(1);
+    top: -80px;
+    left: -80px;
+    transform: rotate(360deg) scale(1);
   }
 }
 
@@ -684,41 +687,36 @@ html, body {
   animation-direction: reverse;
 }
 
-/* Diagonal movement - zigzag pattern */
-.cyber-monkey-diagonal {
-  animation-name: monkeyDiagonal;
+/* Orbit movement - elliptical path around reels */
+.cyber-monkey-orbit {
+  animation-name: monkeyOrbit;
 }
 
-@keyframes monkeyDiagonal {
+@keyframes monkeyOrbit {
   0% {
-    top: -70px;
-    left: -70px;
-    transform: rotate(0deg) scale(1);
+    top: 50%;
+    left: -100px;
+    transform: translate(0, -50%) rotate(0deg) scale(1);
   }
-  20% {
-    top: 30%;
-    left: 30%;
-    transform: rotate(45deg) scale(1.2);
+  25% {
+    top: -100px;
+    left: 50%;
+    transform: translate(-50%, 0) rotate(90deg) scale(1.2);
   }
-  40% {
-    top: 60%;
-    left: 70%;
-    transform: rotate(-30deg) scale(0.9);
+  50% {
+    top: 50%;
+    left: calc(100% + 40px);
+    transform: translate(0, -50%) rotate(180deg) scale(1);
   }
-  60% {
-    top: calc(100% + 70px);
-    left: calc(100% - 70px);
-    transform: rotate(60deg) scale(1.1);
-  }
-  80% {
-    top: 40%;
-    left: 20%;
-    transform: rotate(-45deg) scale(1);
+  75% {
+    top: calc(100% + 40px);
+    left: 50%;
+    transform: translate(-50%, 0) rotate(270deg) scale(1.2);
   }
   100% {
-    top: -70px;
-    left: -70px;
-    transform: rotate(0deg) scale(1);
+    top: 50%;
+    left: -100px;
+    transform: translate(0, -50%) rotate(360deg) scale(1);
   }
 }
 
