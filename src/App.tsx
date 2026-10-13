@@ -898,6 +898,27 @@ export default function App() {
     setAutoSpinTotal(0);
   };
 
+  // 🇺🇸 External Debt USA - шуточная функция
+  const takeUSADebt = () => {
+    // Берём "внешний долг США" — огромная сумма с огромным процентом
+    const usaLoanAmount = 1000000; // 1 миллион
+    const usaInterest = 0.25; // 25% годовых (как у США)
+    const repayment = usaLoanAmount * (1 + usaInterest);
+    
+    loanRef.current.state.debt += repayment;
+    loanRef.current.state.loanCount++;
+    loanRef.current.state.totalBorrowed += repayment;
+    
+    setBalance(b => b + usaLoanAmount);
+    setDebt(loanRef.current.state.debt);
+    setLoanCount(loanRef.current.state.loanCount);
+    
+    audioRef.current.playLoanTaken();
+    statsRef.current.recordLoan();
+    
+    showToast('🇺🇸', `Внешний долг США: +${usaLoanAmount.toLocaleString()} (долг: ${Math.floor(loanRef.current.state.debt).toLocaleString()})`);
+  };
+
   const handleEnterCasino = (selectedBalance: number) => {
     setBalance(selectedBalance);
     setStartBalance(selectedBalance);
@@ -1046,6 +1067,24 @@ export default function App() {
   // ============ GAME SCREEN ============
   return (
     <div className={`w-full h-full flex flex-col overflow-hidden grid-bg ${freeSpinsActive ? 'bonus-bg' : ''}`}>
+      {/* Fixed debt indicator - AGGRESSIVE RED, bottom right (FIRST to ensure it's on top) */}
+      {debt > 0 && (
+        <div className="fixed bottom-4 right-4 z-[9999] px-4 py-3 rounded-xl debt-indicator-aggressive">
+          <div className="flex items-center gap-2">
+            <span className="text-xl animate-pulse">💳</span>
+            <div>
+              <div className="text-[9px] uppercase tracking-wider text-red-300 font-bold">ДОЛГ</div>
+              <div className="text-lg font-black text-red-500" style={{ 
+                fontFamily: 'Share Tech Mono',
+                textShadow: '0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff3333'
+              }}>
+                {Math.floor(debt).toLocaleString()}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Particle Canvas */}
       <canvas ref={canvasRef} className="particle-canvas" />
 
@@ -1122,8 +1161,12 @@ export default function App() {
           <div className="absolute bottom-1 left-1 w-3 h-3 border-b-2 border-l-2 border-cyan-400/50 rounded-bl" />
           <div className="absolute bottom-1 right-1 w-3 h-3 border-b-2 border-r-2 border-cyan-400/50 rounded-br" />
           
-          {/* CYBER MONKEY - runs around the reels! */}
-          <div className="cyber-monkey">🐵</div>
+          {/* CYBER MONKEYS - multiple monkeys running around the reels! */}
+          <div className="cyber-monkey" style={{ animationDelay: '0s', animationDuration: '6s' }}>🐵</div>
+          <div className="cyber-monkey" style={{ animationDelay: '2s', animationDuration: '8s' }}>🐒</div>
+          <div className="cyber-monkey" style={{ animationDelay: '4s', animationDuration: '7s' }}>🙊</div>
+          <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '1s', animationDuration: '9s' }}>🙉</div>
+          <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '3s', animationDuration: '6.5s' }}>🙈</div>
           
           {/* Reels with enhanced styling */}
           <div className="flex gap-2 sm:gap-3 relative p-2 sm:p-3 rounded-xl" style={{
@@ -1278,6 +1321,14 @@ export default function App() {
           <button className="ctrl-btn text-sm sm:text-base px-3 sm:px-4 py-2 sm:py-2.5" onClick={() => setShowAchievements(true)}>
             🏆
           </button>
+          {/* 🇺🇸 External Debt USA button */}
+          <button 
+            className="ctrl-btn text-[10px] sm:text-xs px-3 sm:px-4 py-1.5 sm:py-2 font-bold border-blue-500/50 text-blue-400 hover:bg-blue-500/10 transition-all"
+            onClick={takeUSADebt}
+            title="Взять внешний долг США (+1,000,000 с 25% годовых)"
+          >
+            🇺🇸 ДОЛГ США
+          </button>
         </div>
       </div>
 
@@ -1424,23 +1475,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Fixed debt indicator - AGGRESSIVE RED, bottom right */}
-      {debt > 0 && (
-        <div className="fixed bottom-4 right-4 z-[100] px-4 py-3 rounded-xl debt-indicator-aggressive">
-          <div className="flex items-center gap-2">
-            <span className="text-xl animate-pulse">💳</span>
-            <div>
-              <div className="text-[9px] uppercase tracking-wider text-red-300 font-bold">ДОЛГ</div>
-              <div className="text-lg font-black text-red-500" style={{ 
-                fontFamily: 'Share Tech Mono',
-                textShadow: '0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff3333'
-              }}>
-                {Math.floor(debt).toLocaleString()}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Exit Summary Modal */}
       {showExitSummary && exitResult && (
