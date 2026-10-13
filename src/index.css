@@ -570,6 +570,165 @@ html, body {
   }
 }
 
+/* AGGRESSIVE RED debt indicator */
+.debt-indicator-aggressive {
+  background: linear-gradient(135deg, rgba(139, 0, 0, 0.95) 0%, rgba(220, 20, 60, 0.9) 100%);
+  border: 3px solid #ff0000;
+  box-shadow: 
+    0 0 20px rgba(255, 0, 0, 0.6),
+    0 0 40px rgba(255, 0, 0, 0.4),
+    0 0 60px rgba(255, 0, 0, 0.2),
+    inset 0 0 20px rgba(255, 0, 0, 0.3);
+  animation: debtAggressivePulse 1.5s ease-in-out infinite;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes debtAggressivePulse {
+  0%, 100% { 
+    box-shadow: 
+      0 0 20px rgba(255, 0, 0, 0.6),
+      0 0 40px rgba(255, 0, 0, 0.4),
+      0 0 60px rgba(255, 0, 0, 0.2),
+      inset 0 0 20px rgba(255, 0, 0, 0.3);
+    transform: scale(1);
+    border-color: #ff0000;
+  }
+  50% { 
+    box-shadow: 
+      0 0 30px rgba(255, 0, 0, 0.8),
+      0 0 60px rgba(255, 0, 0, 0.6),
+      0 0 90px rgba(255, 0, 0, 0.4),
+      inset 0 0 30px rgba(255, 0, 0, 0.5);
+    transform: scale(1.05);
+    border-color: #ff3333;
+  }
+}
+
+/* Cyber Monkey - runs around the reels */
+.cyber-monkey {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  font-size: 45px;
+  pointer-events: none;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 15px #00f0ff) drop-shadow(0 0 25px #ff00ea);
+  animation: monkeyRun 6s linear infinite;
+}
+
+.cyber-monkey::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: monkeyGlow 2s ease-in-out infinite;
+}
+
+@keyframes monkeyGlow {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes monkeyRun {
+  0% {
+    top: 10%;
+    left: -70px;
+    transform: rotate(0deg) scaleX(1);
+  }
+  24% {
+    top: 10%;
+    left: calc(100% + 10px);
+    transform: rotate(15deg) scaleX(1);
+  }
+  25% {
+    top: 10%;
+    right: -70px;
+    left: auto;
+    transform: rotate(15deg) scaleX(-1);
+  }
+  49% {
+    top: calc(100% - 70px);
+    right: -70px;
+    left: auto;
+    transform: rotate(-15deg) scaleX(-1);
+  }
+  50% {
+    top: calc(100% - 70px);
+    right: auto;
+    left: -70px;
+    transform: rotate(-15deg) scaleX(1);
+  }
+  74% {
+    top: calc(100% - 70px);
+    left: calc(100% + 10px);
+    transform: rotate(15deg) scaleX(1);
+  }
+  75% {
+    top: calc(100% - 70px);
+    left: -70px;
+    transform: rotate(15deg) scaleX(1);
+  }
+  100% {
+    top: 10%;
+    left: -70px;
+    transform: rotate(0deg) scaleX(1);
+  }
+}
+
+/* Enhanced reel styling */
+.reel-enhanced {
+  position: relative;
+  background: linear-gradient(180deg, 
+    rgba(10, 14, 39, 0.95) 0%, 
+    rgba(15, 21, 53, 0.9) 50%, 
+    rgba(10, 14, 39, 0.95) 100%
+  );
+  border: 2px solid rgba(0, 240, 255, 0.3);
+  box-shadow: 
+    0 0 15px rgba(0, 240, 255, 0.2),
+    inset 0 0 20px rgba(0, 240, 255, 0.05);
+  overflow: hidden;
+}
+
+.reel-enhanced::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    #00f0ff 50%, 
+    transparent 100%
+  );
+  animation: reelScanline 3s linear infinite;
+}
+
+@keyframes reelScanline {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+.reel-enhanced::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 240, 255, 0.03) 2px,
+      rgba(0, 240, 255, 0.03) 4px
+    );
+  pointer-events: none;
+}
+
 /* Exit summary modal */
 .exit-summary-modal {
   background: linear-gradient(135deg, var(--bg-panel) 0%, rgba(15, 21, 53, 0.98) 100%);
