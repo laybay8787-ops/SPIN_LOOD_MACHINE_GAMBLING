@@ -1066,7 +1066,7 @@ export default function App() {
 
   // ============ GAME SCREEN ============
   return (
-    <div className={`w-full h-full flex flex-col overflow-hidden grid-bg ${freeSpinsActive ? 'bonus-bg' : ''}`}>
+    <div className={`w-full h-full flex flex-col grid-bg ${freeSpinsActive ? 'bonus-bg' : ''}`}>
       {/* Particle Canvas */}
       <canvas ref={canvasRef} className="particle-canvas" />
 
@@ -1123,16 +1123,22 @@ export default function App() {
 
       {/* Game Field with enhanced design */}
       <div className="flex-1 flex items-center justify-center px-2 sm:px-4 py-2 min-h-0">
-        <div className={`relative rounded-2xl p-2 sm:p-3 border-2 transition-all duration-500 ${
-          freeSpinsActive 
-            ? 'border-yellow-400 shadow-[0_0_30px_rgba(255,215,0,0.5),0_0_60px_rgba(255,215,0,0.2)]' 
-            : debt > 0 
-              ? 'border-red-500 shadow-[0_0_20px_rgba(255,51,102,0.4),0_0_40px_rgba(255,51,102,0.2)]'
-              : 'border-cyan-500/70 shadow-[0_0_20px_rgba(0,240,255,0.3),0_0_40px_rgba(0,240,255,0.1)]'
-        }`} style={{ 
-          background: 'linear-gradient(135deg, rgba(15, 21, 53, 0.9) 0%, rgba(10, 14, 39, 0.95) 100%)',
-          backdropFilter: 'blur(10px)',
+        {/* Monkey flight zone - larger container for monkeys to fly around */}
+        <div className="relative" style={{ 
+          padding: '100px',
+          margin: '-100px'
         }}>
+          {/* Inner container for reels */}
+          <div className={`relative rounded-2xl p-2 sm:p-3 border-2 transition-all duration-500 ${
+            freeSpinsActive 
+              ? 'border-yellow-400 shadow-[0_0_30px_rgba(255,215,0,0.5),0_0_60px_rgba(255,215,0,0.2)]' 
+              : debt > 0 
+                ? 'border-red-500 shadow-[0_0_20px_rgba(255,51,102,0.4),0_0_40px_rgba(255,51,102,0.2)]'
+                : 'border-cyan-500/70 shadow-[0_0_20px_rgba(0,240,255,0.3),0_0_40px_rgba(0,240,255,0.1)]'
+          }`} style={{ 
+            background: 'linear-gradient(135deg, rgba(15, 21, 53, 0.9) 0%, rgba(10, 14, 39, 0.95) 100%)',
+            backdropFilter: 'blur(10px)',
+          }}>
           {/* Inner glow effect */}
           <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{
             boxShadow: 'inset 0 0 30px rgba(255, 0, 234, 0.08), inset 0 0 60px rgba(0, 240, 255, 0.05)'
@@ -1142,23 +1148,6 @@ export default function App() {
           <div className="absolute top-1 right-1 w-3 h-3 border-t-2 border-r-2 border-cyan-400/50 rounded-tr" />
           <div className="absolute bottom-1 left-1 w-3 h-3 border-b-2 border-l-2 border-cyan-400/50 rounded-bl" />
           <div className="absolute bottom-1 right-1 w-3 h-3 border-b-2 border-r-2 border-cyan-400/50 rounded-br" />
-          
-          {/* CYBER MONKEY ARMY - 15 monkeys running around the reels! */}
-          <div className="cyber-monkey" style={{ animationDelay: '0s', animationDuration: '6s' }}>🐵</div>
-          <div className="cyber-monkey" style={{ animationDelay: '2s', animationDuration: '8s' }}>🐒</div>
-          <div className="cyber-monkey" style={{ animationDelay: '4s', animationDuration: '7s' }}>🙊</div>
-          <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '1s', animationDuration: '9s' }}>🙉</div>
-          <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '3s', animationDuration: '6.5s' }}>🙈</div>
-          <div className="cyber-monkey cyber-monkey-diagonal" style={{ animationDelay: '0.5s', animationDuration: '5s' }}>🦧</div>
-          <div className="cyber-monkey cyber-monkey-diagonal" style={{ animationDelay: '2.5s', animationDuration: '7.5s' }}>🦍</div>
-          <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '1.5s', animationDuration: '10s' }}>🐵</div>
-          <div className="cyber-monkey" style={{ animationDelay: '3.5s', animationDuration: '5.5s' }}>🐒</div>
-          <div className="cyber-monkey cyber-monkey-diagonal" style={{ animationDelay: '4.5s', animationDuration: '8.5s' }}>🙊</div>
-          <div className="cyber-monkey" style={{ animationDelay: '0.8s', animationDuration: '6.8s' }}>🙉</div>
-          <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '2.8s', animationDuration: '9.5s' }}>🙈</div>
-          <div className="cyber-monkey cyber-monkey-diagonal" style={{ animationDelay: '1.8s', animationDuration: '7.2s' }}>🦧</div>
-          <div className="cyber-monkey" style={{ animationDelay: '3.8s', animationDuration: '6.2s' }}>🦍</div>
-          <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '0.3s', animationDuration: '11s' }}>🐵</div>
           
           {/* Reels with enhanced styling */}
           <div className="flex gap-2 sm:gap-3 relative p-2 sm:p-3 rounded-xl" style={{
@@ -1225,6 +1214,24 @@ export default function App() {
               })}
             </svg>
           )}
+        </div>
+        
+        {/* CYBER MONKEY ARMY - 15 monkeys flying around the reels (OUTSIDE)! */}
+        <div className="cyber-monkey" style={{ animationDelay: '0s', animationDuration: '6s' }}>🐵</div>
+        <div className="cyber-monkey" style={{ animationDelay: '2s', animationDuration: '8s' }}>🐒</div>
+        <div className="cyber-monkey" style={{ animationDelay: '4s', animationDuration: '7s' }}>🙊</div>
+        <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '1s', animationDuration: '9s' }}>🙉</div>
+        <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '3s', animationDuration: '6.5s' }}>🙈</div>
+        <div className="cyber-monkey cyber-monkey-orbit" style={{ animationDelay: '0.5s', animationDuration: '5s' }}>🦧</div>
+        <div className="cyber-monkey cyber-monkey-orbit" style={{ animationDelay: '2.5s', animationDuration: '7.5s' }}>🦍</div>
+        <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '1.5s', animationDuration: '10s' }}>🐵</div>
+        <div className="cyber-monkey" style={{ animationDelay: '3.5s', animationDuration: '5.5s' }}>🐒</div>
+        <div className="cyber-monkey cyber-monkey-orbit" style={{ animationDelay: '4.5s', animationDuration: '8.5s' }}>🙊</div>
+        <div className="cyber-monkey" style={{ animationDelay: '0.8s', animationDuration: '6.8s' }}>🙉</div>
+        <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '2.8s', animationDuration: '9.5s' }}>🙈</div>
+        <div className="cyber-monkey cyber-monkey-orbit" style={{ animationDelay: '1.8s', animationDuration: '7.2s' }}>🦧</div>
+        <div className="cyber-monkey" style={{ animationDelay: '3.8s', animationDuration: '6.2s' }}>🦍</div>
+        <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '0.3s', animationDuration: '11s' }}>🐵</div>
         </div>
       </div>
 
