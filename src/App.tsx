@@ -1067,24 +1067,6 @@ export default function App() {
   // ============ GAME SCREEN ============
   return (
     <div className={`w-full h-full flex flex-col overflow-hidden grid-bg ${freeSpinsActive ? 'bonus-bg' : ''}`}>
-      {/* Fixed debt indicator - AGGRESSIVE RED, bottom right (FIRST to ensure it's on top) */}
-      {debt > 0 && (
-        <div className="fixed bottom-4 right-4 z-[9999] px-4 py-3 rounded-xl debt-indicator-aggressive">
-          <div className="flex items-center gap-2">
-            <span className="text-xl animate-pulse">💳</span>
-            <div>
-              <div className="text-[9px] uppercase tracking-wider text-red-300 font-bold">ДОЛГ</div>
-              <div className="text-lg font-black text-red-500" style={{ 
-                fontFamily: 'Share Tech Mono',
-                textShadow: '0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff3333'
-              }}>
-                {Math.floor(debt).toLocaleString()}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Particle Canvas */}
       <canvas ref={canvasRef} className="particle-canvas" />
 
@@ -1534,6 +1516,49 @@ export default function App() {
             >
               {exitResult.type === 'profit' ? '🎰 Забрать выигрыш' : '🚪 Выйти'}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Fixed debt indicator - OUTSIDE overflow container, bottom right */}
+      {debt > 0 && (
+        <div 
+          style={{
+            position: 'fixed',
+            bottom: '16px',
+            right: '16px',
+            zIndex: 99999,
+            padding: '12px 16px',
+            borderRadius: '12px',
+            background: 'linear-gradient(135deg, rgba(139, 0, 0, 0.95) 0%, rgba(220, 20, 60, 0.9) 100%)',
+            border: '3px solid #ff0000',
+            boxShadow: '0 0 20px rgba(255, 0, 0, 0.6), 0 0 40px rgba(255, 0, 0, 0.4), 0 0 60px rgba(255, 0, 0, 0.2), inset 0 0 20px rgba(255, 0, 0, 0.3)',
+            backdropFilter: 'blur(10px)',
+            animation: 'debtAggressivePulse 1.5s ease-in-out infinite'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '20px', animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}>💳</span>
+            <div>
+              <div style={{ 
+                fontSize: '9px', 
+                textTransform: 'uppercase', 
+                letterSpacing: '0.05em', 
+                color: '#fca5a5', 
+                fontWeight: 'bold' 
+              }}>
+                ДОЛГ
+              </div>
+              <div style={{ 
+                fontSize: '18px', 
+                fontWeight: 900, 
+                color: '#ef4444',
+                fontFamily: 'Share Tech Mono, monospace',
+                textShadow: '0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff3333'
+              }}>
+                {Math.floor(debt).toLocaleString()}
+              </div>
+            </div>
           </div>
         </div>
       )}
