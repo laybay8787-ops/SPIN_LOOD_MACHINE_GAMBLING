@@ -1143,12 +1143,22 @@ export default function App() {
           <div className="absolute bottom-1 left-1 w-3 h-3 border-b-2 border-l-2 border-cyan-400/50 rounded-bl" />
           <div className="absolute bottom-1 right-1 w-3 h-3 border-b-2 border-r-2 border-cyan-400/50 rounded-br" />
           
-          {/* CYBER MONKEYS - multiple monkeys running around the reels! */}
+          {/* CYBER MONKEY ARMY - 15 monkeys running around the reels! */}
           <div className="cyber-monkey" style={{ animationDelay: '0s', animationDuration: '6s' }}>🐵</div>
           <div className="cyber-monkey" style={{ animationDelay: '2s', animationDuration: '8s' }}>🐒</div>
           <div className="cyber-monkey" style={{ animationDelay: '4s', animationDuration: '7s' }}>🙊</div>
           <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '1s', animationDuration: '9s' }}>🙉</div>
           <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '3s', animationDuration: '6.5s' }}>🙈</div>
+          <div className="cyber-monkey cyber-monkey-diagonal" style={{ animationDelay: '0.5s', animationDuration: '5s' }}>🦧</div>
+          <div className="cyber-monkey cyber-monkey-diagonal" style={{ animationDelay: '2.5s', animationDuration: '7.5s' }}>🦍</div>
+          <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '1.5s', animationDuration: '10s' }}>🐵</div>
+          <div className="cyber-monkey" style={{ animationDelay: '3.5s', animationDuration: '5.5s' }}>🐒</div>
+          <div className="cyber-monkey cyber-monkey-diagonal" style={{ animationDelay: '4.5s', animationDuration: '8.5s' }}>🙊</div>
+          <div className="cyber-monkey" style={{ animationDelay: '0.8s', animationDuration: '6.8s' }}>🙉</div>
+          <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '2.8s', animationDuration: '9.5s' }}>🙈</div>
+          <div className="cyber-monkey cyber-monkey-diagonal" style={{ animationDelay: '1.8s', animationDuration: '7.2s' }}>🦧</div>
+          <div className="cyber-monkey" style={{ animationDelay: '3.8s', animationDuration: '6.2s' }}>🦍</div>
+          <div className="cyber-monkey cyber-monkey-reverse" style={{ animationDelay: '0.3s', animationDuration: '11s' }}>🐵</div>
           
           {/* Reels with enhanced styling */}
           <div className="flex gap-2 sm:gap-3 relative p-2 sm:p-3 rounded-xl" style={{

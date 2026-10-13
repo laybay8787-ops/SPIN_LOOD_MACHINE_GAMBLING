@@ -684,6 +684,63 @@ html, body {
   animation-direction: reverse;
 }
 
+/* Diagonal movement - zigzag pattern */
+.cyber-monkey-diagonal {
+  animation-name: monkeyDiagonal;
+}
+
+@keyframes monkeyDiagonal {
+  0% {
+    top: -70px;
+    left: -70px;
+    transform: rotate(0deg) scale(1);
+  }
+  20% {
+    top: 30%;
+    left: 30%;
+    transform: rotate(45deg) scale(1.2);
+  }
+  40% {
+    top: 60%;
+    left: 70%;
+    transform: rotate(-30deg) scale(0.9);
+  }
+  60% {
+    top: calc(100% + 70px);
+    left: calc(100% - 70px);
+    transform: rotate(60deg) scale(1.1);
+  }
+  80% {
+    top: 40%;
+    left: 20%;
+    transform: rotate(-45deg) scale(1);
+  }
+  100% {
+    top: -70px;
+    left: -70px;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+/* Different monkey sizes */
+.cyber-monkey:nth-child(3n) {
+  font-size: 35px;
+  width: 50px;
+  height: 50px;
+}
+
+.cyber-monkey:nth-child(3n+1) {
+  font-size: 50px;
+  width: 65px;
+  height: 65px;
+}
+
+.cyber-monkey:nth-child(3n+2) {
+  font-size: 40px;
+  width: 55px;
+  height: 55px;
+}
+
 /* Enhanced reel styling */
 .reel-enhanced {
   position: relative;
