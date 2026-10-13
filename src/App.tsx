@@ -186,9 +186,9 @@ function ReelColumnFixed({
   }, [spinning, stopped, symbols, reelIndex]);
 
   return (
-    <div className="reel-container" style={{ width: 'var(--cell-size)', height: `calc(var(--cell-size) * 3)` }}>
+    <div className="reel-enhanced rounded-lg" style={{ width: 'var(--cell-size)', height: `calc(var(--cell-size) * 3)` }}>
       <div 
-        className="reel-strip"
+        className="reel-strip relative z-10"
         style={{ 
           transform: `translateY(${offset}px)`,
           filter: spinning && !stopped ? 'blur(2px)' : 'none',
@@ -1122,8 +1122,14 @@ export default function App() {
           <div className="absolute bottom-1 left-1 w-3 h-3 border-b-2 border-l-2 border-cyan-400/50 rounded-bl" />
           <div className="absolute bottom-1 right-1 w-3 h-3 border-b-2 border-r-2 border-cyan-400/50 rounded-br" />
           
-          {/* Reels */}
-          <div className="flex gap-1 relative">
+          {/* CYBER MONKEY - runs around the reels! */}
+          <div className="cyber-monkey">🐵</div>
+          
+          {/* Reels with enhanced styling */}
+          <div className="flex gap-2 sm:gap-3 relative p-2 sm:p-3 rounded-xl" style={{
+            background: 'linear-gradient(135deg, rgba(0, 240, 255, 0.05) 0%, rgba(255, 0, 234, 0.05) 100%)',
+            boxShadow: 'inset 0 0 30px rgba(0, 240, 255, 0.1), 0 0 20px rgba(0, 240, 255, 0.2)'
+          }}>
             {grid.map((reel, reelIdx) => {
               const winningCells = new Set<number>();
               const nearMissCells = new Set<number>();
@@ -1418,13 +1424,19 @@ export default function App() {
         </div>
       )}
 
-      {/* Fixed debt indicator - compact, bottom right */}
+      {/* Fixed debt indicator - AGGRESSIVE RED, bottom right */}
       {debt > 0 && (
-        <div className="fixed bottom-2 right-2 z-50 px-3 py-1.5 rounded-lg bg-red-950/80 border border-red-500/50 backdrop-blur-sm shadow-lg shadow-red-500/20">
-          <div className="flex items-center gap-1.5">
-            <span className="text-sm">💳</span>
-            <div className="text-xs font-bold text-red-400" style={{ fontFamily: 'Share Tech Mono' }}>
-              {Math.floor(debt).toLocaleString()}
+        <div className="fixed bottom-4 right-4 z-[100] px-4 py-3 rounded-xl debt-indicator-aggressive">
+          <div className="flex items-center gap-2">
+            <span className="text-xl animate-pulse">💳</span>
+            <div>
+              <div className="text-[9px] uppercase tracking-wider text-red-300 font-bold">ДОЛГ</div>
+              <div className="text-lg font-black text-red-500" style={{ 
+                fontFamily: 'Share Tech Mono',
+                textShadow: '0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff3333'
+              }}>
+                {Math.floor(debt).toLocaleString()}
+              </div>
             </div>
           </div>
         </div>
