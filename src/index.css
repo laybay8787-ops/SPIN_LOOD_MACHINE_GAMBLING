@@ -679,6 +679,11 @@ html, body {
   }
 }
 
+/* Reverse direction - counter-clockwise */
+.cyber-monkey-reverse {
+  animation-direction: reverse;
+}
+
 /* Enhanced reel styling */
 .reel-enhanced {
   position: relative;
