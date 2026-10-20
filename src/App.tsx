@@ -1155,8 +1155,11 @@ export default function App() {
       <div className="flex-1 flex items-center justify-center px-2 sm:px-4 py-2 min-h-0">
         {/* Monkey flight zone - larger container for monkeys to fly around */}
         <div className="relative" style={{ 
-          padding: '100px',
-          margin: '-100px'
+          padding: '80px',
+          margin: '-80px',
+          maxWidth: 'calc(100% + 160px)',
+          marginLeft: '-80px',
+          marginRight: '-80px'
         }}>
           {/* Inner container for reels */}
           <div className={`relative rounded-2xl p-2 sm:p-3 border-2 transition-all duration-500 ${
