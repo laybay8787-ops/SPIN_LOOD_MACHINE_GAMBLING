@@ -328,6 +328,53 @@ http://192.168.X.X:5173
 
 ---
 
+## 📄 Открытие через HTML файл
+
+Если вы хотите открыть игру как обычный HTML файл (без сервера):
+
+### Способ 1: Автоматическая сборка standalone HTML
+
+```bash
+# 1. Соберите проект
+npm run build
+
+# 2. Создайте standalone HTML файл
+node create-standalone.js
+
+# 3. Откройте neon-cyber-spin.html в браузере
+```
+
+Этот скрипт создаст файл `neon-cyber-spin.html` со всем кодом внутри (CSS и JS инлайнятся в HTML).
+
+### Способ 2: Использование live-server
+
+```bash
+# Установите live-server глобально
+npm install -g live-server
+
+# Запустите сервер в папке dist
+cd dist
+live-server
+
+# Откройте http://127.0.0.1:8080 в браузере
+```
+
+### Способ 3: Python HTTP Server
+
+```bash
+# Перейдите в папку dist
+cd dist
+
+# Запустите Python сервер
+python -m http.server 8000
+
+# Откройте http://localhost:8000 в браузере
+```
+
+**Примечание:** Нельзя просто открыть `dist/index.html` двойным кликом из-за ограничений безопасности браузера (CORS для ES6 модулей). Используйте один из способов выше.
+
+---
+
 ## 🌐 Деплой на хостинг
 
 Готовый `dist/` folder можно деплоить на любой статический хостинг:
@@ -344,11 +391,43 @@ vercel deploy
 2. Перетащите папку `dist/` в Netlify Drop
 3. Получите мгновенный URL
 
-### GitHub Pages
+### GitHub Pages (Автоматический деплой)
+
+**Вариант 1: Автоматический деплой через GitHub Actions**
+
+1. Создайте репозиторий на GitHub
+2. Загрузите все файлы проекта (включая `.github/workflows/deploy.yml`)
+3. Перейдите в Settings → Pages
+4. В разделе "Build and deployment" выберите:
+   - Source: **GitHub Actions**
+5. После push в main/master автоматически запустится деплой
+6. Сайт будет доступен по адресу: `https://username.github.io/repository-name/`
+
+**Вариант 2: Ручной деплой**
+
 ```bash
+# 1. Соберите проект
 npm run build
-# Загрузите содержимое dist/ в репозиторий GitHub
-# Включите GitHub Pages в настройках репозитория
+
+# 2. Создайте репозиторий на GitHub
+
+# 3. Загрузите содержимое папки dist/ в репозиторий
+git init
+git add .
+git commit -m "Deploy to GitHub Pages"
+git branch -M main
+git remote add origin https://github.com/username/repository-name.git
+git push -u origin main
+
+# 4. В настройках репозитория (Settings → Pages):
+#    - Source: Deploy from a branch
+#    - Branch: main / root
+# 5. Сайт будет доступен через 1-2 минуты
+```
+
+**Важно:** Если сайт открывается по пути `https://username.github.io/repository-name/`, убедитесь что в `vite.config.ts` указано:
+```typescript
+base: '/repository-name/'
 ```
 
 ### Любой хостинг
