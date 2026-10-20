@@ -449,9 +449,25 @@ export default function App() {
   const [screen, setScreen] = useState<GameScreen>('start');
   
   // Game state
-  const [balance, setBalance] = useState<number>(CONFIG.DEFAULT_START_BALANCE as number);
+  const [balance, setBalance] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem(CONFIG.STORAGE_PREFIX + 'balance');
+      return saved ? parseFloat(saved) : (CONFIG.DEFAULT_START_BALANCE as number);
+    } catch (e) {
+      console.warn('Failed to load balance from localStorage:', e);
+      return CONFIG.DEFAULT_START_BALANCE as number;
+    }
+  });
   const [startBalance, setStartBalance] = useState<number>(CONFIG.DEFAULT_START_BALANCE as number);
-  const [betIndex, setBetIndex] = useState<number>(CONFIG.DEFAULT_BET_INDEX);
+  const [betIndex, setBetIndex] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem(CONFIG.STORAGE_PREFIX + 'betIndex');
+      return saved ? parseInt(saved) : CONFIG.DEFAULT_BET_INDEX;
+    } catch (e) {
+      console.warn('Failed to load betIndex from localStorage:', e);
+      return CONFIG.DEFAULT_BET_INDEX;
+    }
+  });
   const [spinning, setSpinning] = useState(false);
   const [grid, setGrid] = useState<string[][]>(() => {
     const symbols = ['cherry', 'lemon', 'bell', 'diamond', 'seven', 'cherry', 'lemon', 'bell'];
@@ -523,12 +539,20 @@ export default function App() {
   // Save balance
   useEffect(() => {
     if (screen === 'game') {
-      localStorage.setItem(CONFIG.STORAGE_PREFIX + 'balance', balance.toString());
+      try {
+        localStorage.setItem(CONFIG.STORAGE_PREFIX + 'balance', balance.toString());
+      } catch (e) {
+        console.warn('Failed to save balance to localStorage:', e);
+      }
     }
   }, [balance, screen]);
 
   useEffect(() => {
-    localStorage.setItem(CONFIG.STORAGE_PREFIX + 'betIndex', betIndex.toString());
+    try {
+      localStorage.setItem(CONFIG.STORAGE_PREFIX + 'betIndex', betIndex.toString());
+    } catch (e) {
+      console.warn('Failed to save betIndex to localStorage:', e);
+    }
   }, [betIndex]);
 
   // Toast auto-hide
@@ -634,7 +658,9 @@ export default function App() {
 
     // Deduct bet (not for free spins)
     if (freeSpinsRef.current <= 0) {
-      setBalance((b: number) => b - currentBet);
+      const newBalance = balanceRef.current - currentBet;
+      setBalance(newBalance);
+      balanceRef.current = newBalance; // Синхронизируем ref
     }
 
     // Contribute to jackpot
@@ -976,12 +1002,16 @@ export default function App() {
   };
 
   const resetGame = () => {
-    localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'balance');
-    localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'betIndex');
-    localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'stats');
-    localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'loans');
-    localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'jackpot');
-    localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'achievements');
+    try {
+      localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'balance');
+      localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'betIndex');
+      localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'stats');
+      localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'loans');
+      localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'jackpot');
+      localStorage.removeItem(CONFIG.STORAGE_PREFIX + 'achievements');
+    } catch (e) {
+      console.warn('Failed to clear localStorage:', e);
+    }
     setBalance(CONFIG.DEFAULT_START_BALANCE);
     setStartBalance(CONFIG.DEFAULT_START_BALANCE);
     setBetIndex(CONFIG.DEFAULT_BET_INDEX);
