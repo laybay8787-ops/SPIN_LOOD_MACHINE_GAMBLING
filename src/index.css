@@ -617,6 +617,8 @@ html, body {
   justify-content: center;
   filter: drop-shadow(0 0 15px #00f0ff) drop-shadow(0 0 25px #ff00ea);
   animation: monkeyFly 6s linear infinite;
+  will-change: transform;
+  transform: translateZ(0); /* GPU acceleration */
 }
 
 .cyber-monkey::before {
